@@ -1,0 +1,3 @@
+# Ustawienia lokalne Claude Code i pliki tymczasowe Pythona — nie trafiają do repozytorium
+.claude/
+__pycache__/
