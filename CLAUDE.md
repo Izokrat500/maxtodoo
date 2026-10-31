@@ -33,4 +33,7 @@ py -m http.server 8765
 Potem otwórz http://localhost:8765 w widoku telefonu.
 
 ## Publikacja
-Appka jest publikowana na Netlify (przeciągnięcie folderu w panelu Netlify). Na iPhonie: Safari → Udostępnij → Do ekranu początkowego.
+- Repozytorium: https://github.com/Izokrat500/maxtodoo (gałąź `main`, publiczne).
+- Netlify (projekt `maxtodoo`, adres https://maxtodoo.netlify.app) jest połączony z GitHubem: każdy `git push` na `main` publikuje appkę automatycznie w kilkanaście sekund. Nie przeciągamy już folderu.
+- Gdy właściciel napisze „opublikuj”: podnieś `VERSION` w `sw.js` (jeśli zmieniły się pliki appki), zrób commit z opisem po polsku i `git push`.
+- Na iPhonie appka aktualizuje się sama przy następnym otwarciu (czasem trzeba ją zamknąć i otworzyć dwa razy). Instalacja: Safari → Udostępnij → Do ekranu początkowego.
