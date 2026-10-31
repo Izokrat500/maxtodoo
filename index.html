@@ -17,7 +17,7 @@
 <meta name="theme-color" content="#0E0F12" media="(prefers-color-scheme: dark)">
 
 <style>
-  /* Layout: jedna kolumna jak natywna lista iOS — duży tytuł, pole dodawania, przełącznik filtrów, grupowana lista na karcie */
+  /* Layout: jedna kolumna jak natywna lista iOS — duży tytuł, przyciski dodawania, przełącznik filtrów, zwijane kategorie na kartach */
   :root {
     --bg: #F2F3F7;
     --card: #FFFFFF;
@@ -70,11 +70,15 @@
   h1 { margin: 0; font-family: var(--font-display); font-size: 34px; font-weight: 700; letter-spacing: -.02em; text-wrap: balance; }
   .count { margin: 0; color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
 
+  .actions { display: flex; flex-direction: column; gap: 8px; }
   .add-btn { width: 100%; height: 52px; border-radius: 14px; background: var(--accent); color: var(--accent-fg); display: grid; place-items: center; box-shadow: var(--shadow); transition: opacity .15s; }
   .add-btn:active { opacity: .8; }
   .add-btn svg { width: 26px; height: 26px; }
+  .cat-btn { width: 100%; height: 44px; border-radius: 14px; background: var(--card); color: var(--accent); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 16px; font-weight: 600; box-shadow: var(--shadow); }
+  .cat-btn svg { width: 18px; height: 18px; }
+  .cat-btn:active { opacity: .7; }
 
-  /* Okienko „Nowe zadanie” — u góry ekranu, żeby klawiatura go nie zasłaniała */
+  /* Okienko (nowe zadanie / edycja / kategoria) — u góry ekranu, żeby klawiatura go nie zasłaniała */
   .sheet {
     position: fixed; inset: 0; z-index: 20; display: flex; justify-content: center; align-items: flex-start;
     padding-top: calc(env(safe-area-inset-top, 0px) + 72px);
@@ -90,17 +94,49 @@
   .sheet-btn:disabled { opacity: .35; cursor: default; }
   .sheet-card input { height: 48px; margin-inline: 8px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--seg-bg); color: var(--fg); font: inherit; font-size: 17px; outline: none; }
   .sheet-card input::placeholder { color: var(--muted); }
+  .chips-label { margin: 6px 16px 0; color: var(--muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; padding-inline: 8px; }
+  .chip { height: 36px; max-width: 100%; padding: 0 14px; border-radius: 18px; background: var(--seg-bg); color: var(--fg); font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
   @keyframes fade { from { opacity: 0; } }
   @keyframes pop { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
 
-  .seg { display: grid; grid-template-columns: repeat(2, 1fr); background: var(--seg-bg); border-radius: 10px; padding: 2px; gap: 2px; }
+  /* Menu opcji kategorii — od dołu, jak w iOS */
+  .menu {
+    position: fixed; inset: 0; z-index: 25; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .menu-card { position: relative; width: 100%; max-width: 528px; display: flex; flex-direction: column; gap: 8px; animation: rise .2s ease-out; }
+  .menu-group { display: flex; flex-direction: column; background: var(--card); border-radius: 14px; overflow: hidden; }
+  .menu-title { margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; text-align: center; overflow-wrap: anywhere; }
+  .menu-btn { height: 56px; color: var(--accent); font-size: 18px; }
+  .menu-btn + .menu-btn { border-top: 1px solid var(--line); }
+  .menu-btn.danger { color: var(--danger); }
+  .menu-btn.strong { font-weight: 600; }
+
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--seg-bg); border-radius: 10px; padding: 2px; gap: 2px; }
   .seg button { height: 34px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--muted); transition: background .15s, color .15s; }
   .seg button[aria-selected="true"] { background: var(--seg-on); color: var(--fg); box-shadow: var(--shadow); }
 
+  /* Listy: zadania bez kategorii na górze, potem zwijane kategorie */
+  .lists { display: flex; flex-direction: column; gap: 20px; }
+  .cat { display: flex; flex-direction: column; gap: 6px; }
+  .cat-head { display: flex; align-items: center; gap: 2px; }
+  .cat-toggle { flex: 1; min-width: 0; height: 44px; display: flex; align-items: center; gap: 8px; padding-left: 2px; text-align: left; }
+  .cat-toggle svg { flex: none; width: 18px; height: 18px; color: var(--muted); transition: transform .18s ease; }
+  .cat.collapsed .cat-toggle svg { transform: rotate(-90deg); }
+  .cat-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .cat-count { flex: none; min-width: 24px; height: 22px; padding: 0 7px; border-radius: 11px; background: var(--seg-bg); color: var(--muted); font-size: 13px; font-weight: 600; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+  .cat-add, .cat-more { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--accent); border-radius: 10px; }
+  .cat-add svg, .cat-more svg { width: 22px; height: 22px; }
+
   .list { list-style: none; margin: 0; padding: 0; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+  .empty-row { padding: 14px 16px; color: var(--muted); font-size: 15px; }
   .item { position: relative; background: var(--card); }
 
-  /* Tło odsłaniane gestem: w lewo = zrobione (zielone) / przywróć (niebieskie), w prawo = usuń (czerwone) */
+  /* Tło odsłaniane gestem: w prawo = zrobione (zielone) / przywróć (niebieskie), w lewo = usuń (czerwone) */
   .swipe-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-inline: 20px; background: var(--danger); color: #FFFFFF; font-size: 15px; font-weight: 600; }
   .item.to-right .swipe-bg { background: var(--success); justify-content: flex-start; }
   .item.done.to-right .swipe-bg { background: var(--accent); }
@@ -111,8 +147,8 @@
   .swipe-label svg { width: 20px; height: 20px; }
   .item.armed .swipe-label { opacity: 1; transform: none; }
 
-  .row { position: relative; z-index: 1; display: flex; align-items: center; gap: 2px; min-height: 52px; padding-left: 4px; background: var(--card); touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-  .item + .item .row::before { content: ""; position: absolute; top: 0; left: 52px; right: 0; border-top: 1px solid var(--line); }
+  .row { position: relative; z-index: 1; display: flex; align-items: center; gap: 2px; min-height: 52px; padding-left: 16px; background: var(--card); touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  .item + .item .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; border-top: 1px solid var(--line); }
 
   /* Przeciąganie */
   .item.dragging { z-index: 5; box-shadow: 0 10px 28px rgba(0, 0, 0, .2); }
@@ -124,12 +160,11 @@
   .item.dragging .grip { color: var(--fg); cursor: grabbing; }
 
   .hint { margin: -6px 0 0; color: var(--muted); font-size: 13px; text-align: center; text-wrap: balance; }
-  .check { flex: none; width: 48px; height: 48px; display: grid; place-items: center; }
-  .ring { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--done); display: grid; place-items: center; transition: background .15s, border-color .15s; }
-  .ring svg { width: 14px; height: 14px; color: var(--accent-fg); opacity: 0; transition: opacity .15s; }
-  .item.done .ring { background: var(--success); border-color: var(--success); }
-  .item.done .ring svg { opacity: 1; color: #FFFFFF; }
-  .text { flex: 1; min-width: 0; padding-block: 13px; overflow-wrap: anywhere; }
+  /* Zielony ptaszek przy zrobionych — tylko znaczek, nie da się go kliknąć */
+  .status { flex: none; width: 24px; height: 24px; margin-right: 10px; border-radius: 50%; background: var(--success); color: #FFFFFF; display: grid; place-items: center; }
+  .status svg { width: 14px; height: 14px; }
+  .text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; padding-block: 13px; overflow-wrap: anywhere; cursor: pointer; }
+  .meta { color: var(--muted); font-size: 13px; }
 
   .empty { text-align: center; padding: 36px 16px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; }
   .empty-title { margin: 0; font-weight: 600; }
@@ -137,9 +172,8 @@
 
   .clear { align-self: center; height: 44px; padding: 0 16px; color: var(--accent); font-size: 15px; font-weight: 600; }
 
-
   .toast {
-    position: fixed; left: 0; right: 0; bottom: 0;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
     padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
@@ -161,16 +195,23 @@
     <p class="count" id="count">&nbsp;</p>
   </header>
 
-  <button class="add-btn" id="addBtn" type="button" aria-label="Dodaj zadanie" aria-haspopup="dialog">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-  </button>
+  <div class="actions">
+    <button class="add-btn" id="addBtn" type="button" aria-label="Dodaj zadanie" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="cat-btn" id="newCatBtn" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Nowa kategoria
+    </button>
+  </div>
 
   <div class="seg" role="tablist" aria-label="Pokaż">
     <button id="f-active" role="tab" data-filter="active" aria-selected="true">Do zrobienia</button>
     <button id="f-done" role="tab" data-filter="done" aria-selected="false">Zrobione</button>
+    <button id="f-daily" role="tab" data-filter="daily" aria-selected="false">Codzienne</button>
   </div>
 
-  <ul class="list" id="list" hidden></ul>
+  <div class="lists" id="lists"></div>
   <p class="hint" id="hint" hidden></p>
 
   <div class="empty" id="empty">
@@ -181,17 +222,34 @@
   <button class="clear" id="clearDone" hidden></button>
 </main>
 
-<!-- Okienko dodawania zadania -->
+<!-- Okienko: nowe zadanie / edycja zadania / nowa kategoria / zmiana nazwy -->
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-backdrop" id="sheetBackdrop"></div>
-  <form class="sheet-card" id="addForm" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" autocomplete="off">
+  <form class="sheet-card" id="sheetForm" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" autocomplete="off">
     <div class="sheet-head">
       <button class="sheet-btn" id="sheetCancel" type="button">Anuluj</button>
       <p class="sheet-title" id="sheetTitle">Nowe zadanie</p>
-      <button class="sheet-btn strong" id="sheetAdd" type="submit" disabled>Dodaj</button>
+      <button class="sheet-btn strong" id="sheetOk" type="submit" disabled>Dodaj</button>
     </div>
-    <input id="newTask" type="text" maxlength="200" placeholder="Co masz do zrobienia?" enterkeyhint="done" aria-label="Treść zadania">
+    <input id="sheetInput" type="text" maxlength="200" enterkeyhint="done" aria-label="Treść">
+    <p class="chips-label" id="chipsLabel">Kategoria</p>
+    <div class="chips" id="chips" role="group" aria-labelledby="chipsLabel"></div>
   </form>
+</div>
+
+<!-- Menu opcji kategorii -->
+<div class="menu" id="menu" hidden>
+  <div class="sheet-backdrop" id="menuBackdrop"></div>
+  <div class="menu-card" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+    <div class="menu-group">
+      <p class="menu-title" id="menuTitle"></p>
+      <button class="menu-btn" id="menuRename" type="button">Zmień nazwę</button>
+      <button class="menu-btn danger" id="menuDelete" type="button"></button>
+    </div>
+    <div class="menu-group">
+      <button class="menu-btn strong" id="menuCancel" type="button">Anuluj</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast" hidden>
@@ -205,10 +263,23 @@
 (function () {
   const $ = (id) => document.getElementById(id);
   const LS_TASKS = 'zadania-v1';
+  const LS_CATS = 'dodo-kategorie';
   const LS_FILTER = 'zadania-filtr';
+  const LS_DAILY = 'dodo-codzienne';
+  const LS_DAILY_FOLD = 'dodo-codzienne-zwiniete';
 
   let tasks = [];
+  let cats = [];   // kategorie w kolejności tworzenia: { id, name, collapsed }
+  let dailies = []; // zadania codzienne: { id, text, order, doneDate } — zrobione, gdy doneDate to dzisiejsza data
+  let dailyDoneCollapsed = true;
   let filter = 'active';
+
+  // Dzisiejsza data jako 'RRRR-MM-DD' (czas lokalny telefonu). Nowy dzień = codzienne wracają same.
+  function today() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function doneToday(d) { return d.doneDate === today(); }
 
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
@@ -223,7 +294,23 @@
       text: String((raw && raw.text) || '').slice(0, 200),
       done: !!(raw && raw.done),
       createdAt: Number(raw && raw.createdAt) || 0,
-      order: Number.isFinite(Number(raw && raw.order)) && raw.order !== null && raw.order !== '' ? Number(raw.order) : null
+      order: Number.isFinite(Number(raw && raw.order)) && raw.order !== null && raw.order !== '' ? Number(raw.order) : null,
+      cat: raw && raw.cat ? String(raw.cat) : null
+    };
+  }
+  function cleanDaily(raw) {
+    return {
+      id: String((raw && raw.id) || newId()),
+      text: String((raw && raw.text) || '').slice(0, 200),
+      order: Number(raw && raw.order) || 0,
+      doneDate: raw && raw.doneDate ? String(raw.doneDate) : null
+    };
+  }
+  function cleanCat(raw) {
+    return {
+      id: String((raw && raw.id) || newId()),
+      name: String((raw && raw.name) || '').slice(0, 40),
+      collapsed: !!(raw && raw.collapsed)
     };
   }
 
@@ -232,12 +319,31 @@
   function topOrder() {
     return tasks.reduce((m, t) => Math.min(m, t.order), 0) - 1;
   }
+  function catById(id) { return cats.find((c) => c.id === id) || null; }
+  function shortText(s) { return s.length > 28 ? s.slice(0, 28) + '…' : s; }
+  function zadan(n) {
+    const last = n % 10, last2 = n % 100;
+    if (n === 1) return '1 zadanie';
+    if (last >= 2 && last <= 4 && (last2 < 12 || last2 > 14)) return n + ' zadania';
+    return n + ' zadań';
+  }
 
   // ---------- Zapis w pamięci telefonu ----------
   function load() {
     let list = [];
+    try { list = JSON.parse(lsGet(LS_CATS)) || []; } catch (e) {}
+    cats = Array.isArray(list) ? list.map(cleanCat).filter((c) => c.name) : [];
+
+    list = [];
     try { list = JSON.parse(lsGet(LS_TASKS)) || []; } catch (e) {}
     tasks = Array.isArray(list) ? list.map(clean).filter((t) => t.text) : [];
+    // Zadanie z nieistniejącą kategorią trafia do „bez kategorii”
+    tasks.forEach((t) => { if (t.cat && !catById(t.cat)) t.cat = null; });
+
+    list = [];
+    try { list = JSON.parse(lsGet(LS_DAILY)) || []; } catch (e) {}
+    dailies = Array.isArray(list) ? list.map(cleanDaily).filter((d) => d.text) : [];
+    dailyDoneCollapsed = lsGet(LS_DAILY_FOLD) !== '0';
     // Starsze zapisy nie miały kolejności — nadaj ją wg dotychczasowego układu (najnowsze na górze)
     if (tasks.some((t) => t.order === null)) {
       tasks.sort((a, b) => (a.done - b.done) || (b.createdAt - a.createdAt));
@@ -250,6 +356,25 @@
       toast('Nie udało się zapisać zmian w pamięci telefonu.');
     }
   }
+  function saveCats() {
+    if (!lsSet(LS_CATS, JSON.stringify(cats))) {
+      toast('Nie udało się zapisać zmian w pamięci telefonu.');
+    }
+  }
+
+  function saveDaily() {
+    if (!lsSet(LS_DAILY, JSON.stringify(dailies))) {
+      toast('Nie udało się zapisać zmian w pamięci telefonu.');
+    }
+  }
+  function addDaily(d) { dailies.push(d); saveDaily(); render(); }
+  function setDailyDone(id, done) {
+    const d = dailies.find((x) => x.id === id);
+    if (d) { d.doneDate = done ? today() : null; saveDaily(); render(); }
+  }
+  function removeDaily(id) {
+    dailies = dailies.filter((x) => x.id !== id); saveDaily(); render();
+  }
 
   function addTask(t) { tasks.push(t); save(); render(); }
   function setDone(id, done) {
@@ -257,79 +382,217 @@
     // Zadanie trafia na górę swojej grupy (świeżo zrobione — na górę zrobionych)
     if (t) { t.done = done; t.order = topOrder(); save(); render(); }
   }
-  function moveTask(ids, from, to) {
-    // ids: zadania jednej grupy w obecnej kolejności; przenosimy pozycję from → to
-    const group = ids.map((id) => tasks.find((t) => t.id === id)).filter(Boolean);
+  function moveItems(arr, ids, from, to) {
+    // ids: elementy jednej listy w obecnej kolejności; przenosimy pozycję from → to
+    const group = ids.map((id) => arr.find((t) => t.id === id)).filter(Boolean);
     const slots = group.map((t) => t.order).sort((a, b) => a - b);
     const [moved] = group.splice(from, 1);
     group.splice(to, 0, moved);
     group.forEach((t, i) => { t.order = slots[i]; });
-    save();
   }
   function removeTasks(ids) {
     tasks = tasks.filter((x) => !ids.includes(x.id)); save(); render();
   }
 
   // ---------- Widok ----------
-  function render() {
-    const active = tasks.filter((t) => !t.done).length;
-    const done = tasks.length - active;
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const ICON_GRIP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 8h14M5 12h14M5 16h14"/></svg>';
+  const ICON_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+  const ICON_MORE = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+  const ICON_CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  const LABEL_DONE = '<span class="swipe-label act-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Zrobione</span>';
+  const LABEL_RESTORE = '<span class="swipe-label act-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>Przywróć</span>';
+  const LABEL_DELETE = '<span class="swipe-label del-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg>Usuń</span>';
 
-    $('count').textContent = tasks.length === 0 ? 'Brak zadań'
-      : 'Do zrobienia: ' + active + (done ? ' · zrobione: ' + done : '');
+  // kind: 'task' (zwykłe zadanie) albo 'daily' (codzienne — „zrobione” znaczy zrobione dzisiaj)
+  function buildItem(t, showCat, kind) {
+    const done = kind === 'daily' ? doneToday(t) : t.done;
+    const li = document.createElement('li');
+    li.className = 'item' + (done ? ' done' : '');
+    li.dataset.id = t.id;
+    li.dataset.kind = kind || 'task';
+
+
+    const text = document.createElement('span');
+    text.className = 'text';
+    const main = document.createElement('span');
+    main.textContent = t.text;
+    text.append(main);
+    const c = showCat && t.cat ? catById(t.cat) : null;
+    if (c) {
+      const meta = document.createElement('span');
+      meta.className = 'meta';
+      meta.textContent = c.name;
+      text.append(meta);
+    }
+
+    const grip = document.createElement('button');
+    grip.className = 'grip';
+    grip.type = 'button';
+    grip.setAttribute('aria-label', 'Przeciągnij, aby zmienić kolejność');
+    grip.innerHTML = ICON_GRIP;
+
+    const bg = document.createElement('div');
+    bg.className = 'swipe-bg';
+    bg.setAttribute('aria-hidden', 'true');
+    bg.innerHTML = (done ? LABEL_RESTORE : LABEL_DONE) + LABEL_DELETE;
+
+    const row = document.createElement('div');
+    row.className = 'row';
+    if (done) {
+      const status = document.createElement('span');
+      status.className = 'status';
+      status.setAttribute('aria-label', 'Zrobione');
+      status.innerHTML = ICON_CHECK;
+      row.append(status);
+    }
+    row.append(text, grip);
+    li.append(bg, row);
+    return li;
+  }
+
+  function buildList(items, showCat, emptyText, kind) {
+    const ul = document.createElement('ul');
+    ul.className = 'list';
+    for (const t of items) ul.append(buildItem(t, showCat, kind));
+    if (!items.length && emptyText) {
+      const li = document.createElement('li');
+      li.className = 'empty-row';
+      li.textContent = emptyText;
+      ul.append(li);
+    }
+    return ul;
+  }
+
+  function buildCategory(c, items) {
+    const sec = document.createElement('section');
+    sec.className = 'cat' + (c.collapsed ? ' collapsed' : '');
+    sec.dataset.cat = c.id;
+
+    const head = document.createElement('div');
+    head.className = 'cat-head';
+
+    const toggle = document.createElement('button');
+    toggle.className = 'cat-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', String(!c.collapsed));
+    toggle.innerHTML = ICON_CHEVRON;
+    const name = document.createElement('span');
+    name.className = 'cat-name';
+    name.textContent = c.name;
+    const count = document.createElement('span');
+    count.className = 'cat-count';
+    count.textContent = items.length;
+    toggle.append(name, count);
+
+    const add = document.createElement('button');
+    add.className = 'cat-add';
+    add.type = 'button';
+    add.setAttribute('aria-label', 'Dodaj zadanie do: ' + c.name);
+    add.innerHTML = ICON_PLUS;
+
+    const more = document.createElement('button');
+    more.className = 'cat-more';
+    more.type = 'button';
+    more.setAttribute('aria-label', 'Opcje kategorii ' + c.name);
+    more.innerHTML = ICON_MORE;
+
+    head.append(toggle, add, more);
+    sec.append(head);
+    if (!c.collapsed) sec.append(buildList(items, false, 'Brak zadań. Dotknij +, aby dodać.'));
+    return sec;
+  }
+
+  // Sekcja „Zrobione dziś” w zakładce Codzienne — zwijana jak kategoria, bez + i ⋯
+  function buildDailyDone(items) {
+    const sec = document.createElement('section');
+    sec.className = 'cat' + (dailyDoneCollapsed ? ' collapsed' : '');
+    sec.dataset.section = 'dailydone';
+    const head = document.createElement('div');
+    head.className = 'cat-head';
+    const toggle = document.createElement('button');
+    toggle.className = 'cat-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', String(!dailyDoneCollapsed));
+    toggle.innerHTML = ICON_CHEVRON;
+    const name = document.createElement('span');
+    name.className = 'cat-name';
+    name.textContent = 'Zrobione dziś';
+    const count = document.createElement('span');
+    count.className = 'cat-count';
+    count.textContent = items.length;
+    toggle.append(name, count);
+    head.append(toggle);
+    sec.append(head);
+    if (!dailyDoneCollapsed) sec.append(buildList(items, false, '', 'daily'));
+    return sec;
+  }
+
+  function render() {
+    const activeCount = tasks.filter((t) => !t.done).length;
+    const doneCount = tasks.length - activeCount;
+    const dailyDoneCount = dailies.filter(doneToday).length;
+
+    if (filter === 'daily') {
+      $('count').textContent = dailies.length === 0 ? 'Brak codziennych zadań'
+        : 'Dziś zrobione: ' + dailyDoneCount + ' z ' + dailies.length;
+    } else {
+      $('count').textContent = tasks.length === 0 ? 'Brak zadań'
+        : 'Do zrobienia: ' + activeCount + (doneCount ? ' · zrobione: ' + doneCount : '');
+    }
+    $('newCatBtn').hidden = filter === 'daily';
 
     document.querySelectorAll('.seg button').forEach((b) => {
       b.setAttribute('aria-selected', String(b.dataset.filter === filter));
     });
 
     const sorted = tasks.slice().sort(byOrder);
-    const shown = sorted.filter((t) => (filter === 'done' ? t.done : !t.done));
+    const lists = $('lists');
+    lists.textContent = '';
 
-    const list = $('list');
-    list.textContent = '';
-    for (const t of shown) {
-      const li = document.createElement('li');
-      li.className = 'item' + (t.done ? ' done' : '');
-      li.dataset.id = t.id;
+    let shownCount;
+    if (filter === 'daily') {
+      const all = dailies.slice().sort((a, b) => a.order - b.order);
+      const todo = all.filter((d) => !doneToday(d));
+      const doneNow = all.filter(doneToday);
+      shownCount = all.length;
+      if (todo.length) lists.append(buildList(todo, false, '', 'daily'));
+      else if (all.length) lists.append(buildList([], false, 'Wszystko na dziś zrobione! Jutro rano zadania wrócą.'));
+      if (doneNow.length) lists.append(buildDailyDone(doneNow));
+      lists.hidden = !lists.children.length;
 
-      const check = document.createElement('button');
-      check.className = 'check';
-      check.type = 'button';
-      check.setAttribute('aria-label', t.done ? 'Oznacz jako niezrobione' : 'Oznacz jako zrobione');
-      check.innerHTML = '<span class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
-
-      const text = document.createElement('span');
-      text.className = 'text';
-      text.textContent = t.text;
-
-      const grip = document.createElement('button');
-      grip.className = 'grip';
-      grip.type = 'button';
-      grip.setAttribute('aria-label', 'Przeciągnij, aby zmienić kolejność');
-      grip.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 8h14M5 12h14M5 16h14"/></svg>';
-
-      const bg = document.createElement('div');
-      bg.className = 'swipe-bg';
-      bg.setAttribute('aria-hidden', 'true');
-      bg.innerHTML = t.done
-        ? '<span class="swipe-label act-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>Przywróć</span>'
-        : '<span class="swipe-label act-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Zrobione</span>';
-      bg.innerHTML += '<span class="swipe-label del-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg>Usuń</span>';
-
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.append(check, text, grip);
-      li.append(bg, row);
-      list.append(li);
+      $('hint').hidden = all.length === 0;
+      $('hint').textContent = 'W prawo — zrobione na dziś. W lewo — usuń na stałe. Jutro rano wszystko wróci do zrobienia.';
+      $('empty').hidden = all.length > 0;
+      $('emptyTitle').textContent = 'Brak codziennych zadań';
+      $('emptySub').textContent = 'Dodaj niebieskim + to, co robisz każdego dnia, np. „Umyć zęby rano”. Każdego ranka wróci na listę.';
+      $('clearDone').hidden = true;
+      return;
     }
-    list.hidden = shown.length === 0;
-    $('hint').hidden = shown.length === 0;
-    $('hint').textContent = filter === 'done'
-      ? 'W prawo — przywróć do zrobienia. W lewo — usuń. Przeciągnij za ≡, aby zmienić kolejność.'
-      : 'W prawo — zrobione. W lewo — usuń. Przeciągnij za ≡, aby zmienić kolejność.';
 
-    $('empty').hidden = shown.length > 0;
-    if (tasks.length === 0) {
+    if (filter === 'done') {
+      const done = sorted.filter((t) => t.done);
+      shownCount = done.length;
+      if (done.length) lists.append(buildList(done, true));
+    } else {
+      const active = sorted.filter((t) => !t.done);
+      shownCount = active.length;
+      const loose = active.filter((t) => !t.cat);
+      if (loose.length) lists.append(buildList(loose, false));
+      for (const c of cats) lists.append(buildCategory(c, active.filter((t) => t.cat === c.id)));
+    }
+    lists.hidden = !lists.children.length;
+
+    $('hint').hidden = shownCount === 0;
+    $('hint').textContent = (filter === 'done'
+      ? 'W prawo — przywróć. W lewo — usuń.'
+      : 'W prawo — zrobione. W lewo — usuń.')
+      + ' Dotknij zadania, aby je zmienić lub przenieść. Przeciągnij za ≡, aby zmienić kolejność.';
+
+    // Pusty stan: gdy nie ma czego pokazać (kategorie liczą się jako treść)
+    const nothing = filter === 'done' ? doneCount === 0 : activeCount === 0 && cats.length === 0;
+    $('empty').hidden = !nothing;
+    if (tasks.length === 0 && cats.length === 0) {
       $('emptyTitle').textContent = 'Lista jest pusta';
       $('emptySub').textContent = 'Dotknij niebieskiego przycisku +, aby dodać pierwsze zadanie.';
     } else if (filter === 'active') {
@@ -341,8 +604,8 @@
     }
 
     const clear = $('clearDone');
-    clear.hidden = done === 0 || filter !== 'done';
-    clear.textContent = 'Wyczyść zrobione (' + done + ')';
+    clear.hidden = doneCount === 0 || filter !== 'done';
+    clear.textContent = 'Wyczyść zrobione (' + doneCount + ')';
   }
 
   // ---------- Komunikaty ----------
@@ -362,57 +625,200 @@
     if (fn) fn();
   });
 
-  // ---------- Akcje ----------
-  const input = $('newTask');
+  // ---------- Okienko ----------
+  // mode: 'add' (nowe zadanie), 'edit' (zmiana zadania), 'newcat' (nowa kategoria), 'renamecat' (zmiana nazwy)
+  const input = $('sheetInput');
+  let sheet = null;          // { mode, taskId, catId }
+  let pickedCat = null;      // kategoria zaznaczona w okienku zadania
 
-  function openSheet() {
-    input.value = '';
-    $('sheetAdd').disabled = true;
+  function renderChips() {
+    const box = $('chips');
+    box.textContent = '';
+    const options = [{ id: null, name: 'Bez kategorii' }].concat(cats);
+    for (const c of options) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.dataset.cat = c.id || '';
+      b.setAttribute('aria-pressed', String(c.id === pickedCat));
+      b.textContent = c.name;
+      box.append(b);
+    }
+  }
+
+  function openSheet(opts) {
+    sheet = opts;
+    // Dodatkowe tryby: 'adddaily' / 'editdaily' — zadanie codzienne (bez kategorii)
+    const isTask = opts.mode === 'add' || opts.mode === 'edit';
+    const isDaily = opts.mode === 'adddaily' || opts.mode === 'editdaily';
+    const t = opts.mode === 'edit' ? tasks.find((x) => x.id === opts.taskId)
+      : opts.mode === 'editdaily' ? dailies.find((x) => x.id === opts.taskId) : null;
+    const c = opts.mode === 'renamecat' ? catById(opts.catId) : null;
+
+    $('sheetTitle').textContent = {
+      add: 'Nowe zadanie', edit: 'Zadanie', newcat: 'Nowa kategoria', renamecat: 'Zmień nazwę',
+      adddaily: 'Codzienne zadanie', editdaily: 'Codzienne zadanie'
+    }[opts.mode];
+    $('sheetOk').textContent = ['add', 'newcat', 'adddaily'].includes(opts.mode) ? 'Dodaj' : 'Zapisz';
+    input.placeholder = isDaily ? 'Co robisz codziennie? np. Umyć zęby rano'
+      : isTask ? 'Co masz do zrobienia?' : 'Nazwa, np. Sport albo Praca';
+    input.maxLength = isTask || isDaily ? 200 : 40;
+    input.value = t ? t.text : c ? c.name : '';
+    $('sheetOk').disabled = !input.value.trim();
+
+    pickedCat = opts.mode === 'edit' && t ? t.cat : (opts.catId && isTask ? opts.catId : null);
+    const showChips = isTask && cats.length > 0;
+    $('chipsLabel').hidden = !showChips;
+    $('chips').hidden = !showChips;
+    if (showChips) renderChips();
+
     $('sheet').hidden = false;
-    input.focus(); // od razu w tym samym dotknięciu — wtedy iPhone pokazuje klawiaturę
+    // Klawiatura od razu przy dodawaniu; przy zmianie zadania nie, żeby łatwo wybrać kategorię
+    if (opts.mode !== 'edit') input.focus();
   }
   function closeSheet() {
     input.blur();
     $('sheet').hidden = true;
+    sheet = null;
   }
 
-  $('addBtn').addEventListener('click', openSheet);
+  $('addBtn').addEventListener('click', () => openSheet({ mode: filter === 'daily' ? 'adddaily' : 'add' }));
+  $('newCatBtn').addEventListener('click', () => openSheet({ mode: 'newcat' }));
   $('sheetCancel').addEventListener('click', closeSheet);
   $('sheetBackdrop').addEventListener('click', closeSheet);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !$('sheet').hidden) closeSheet();
-  });
-  input.addEventListener('input', () => { $('sheetAdd').disabled = !input.value.trim(); });
+  input.addEventListener('input', () => { $('sheetOk').disabled = !input.value.trim(); });
 
-  $('addForm').addEventListener('submit', (e) => {
+  $('chips').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip');
+    if (!b) return;
+    pickedCat = b.dataset.cat || null;
+    $('chips').querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  });
+
+  $('sheetForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const text = input.value.trim();
-    if (!text) return;
-    if (filter === 'done') { filter = 'active'; lsSet(LS_FILTER, filter); }
-    addTask({ id: newId(), text: text, done: false, createdAt: Date.now(), order: topOrder() });
+    if (!text || !sheet) return;
+
+    if (sheet.mode === 'add') {
+      if (filter === 'done') { filter = 'active'; lsSet(LS_FILTER, filter); }
+      const c = catById(pickedCat);
+      if (c && c.collapsed) { c.collapsed = false; saveCats(); }
+      addTask({ id: newId(), text: text, done: false, createdAt: Date.now(), order: topOrder(), cat: c ? c.id : null });
+    } else if (sheet.mode === 'edit') {
+      const t = tasks.find((x) => x.id === sheet.taskId);
+      if (t) {
+        const moved = t.cat !== pickedCat;
+        t.text = text;
+        t.cat = pickedCat;
+        if (moved) {
+          t.order = topOrder(); // w nowej kategorii ląduje na górze
+          const c = catById(pickedCat);
+          if (c && c.collapsed) { c.collapsed = false; saveCats(); }
+        }
+        save(); render();
+        if (moved) toast('Przeniesiono do: ' + (catById(pickedCat) ? catById(pickedCat).name : 'Bez kategorii'));
+      }
+    } else if (sheet.mode === 'newcat') {
+      if (filter === 'done') { filter = 'active'; lsSet(LS_FILTER, filter); }
+      cats.push({ id: newId(), name: text, collapsed: false });
+      saveCats(); render();
+    } else if (sheet.mode === 'renamecat') {
+      const c = catById(sheet.catId);
+      if (c) { c.name = text; saveCats(); render(); }
+    } else if (sheet.mode === 'adddaily') {
+      // Nowe codzienne trafia na koniec listy — kolejność dnia ustawiasz przeciąganiem
+      const last = dailies.reduce((m, d) => Math.max(m, d.order), 0);
+      addDaily({ id: newId(), text: text, order: last + 1, doneDate: null });
+    } else if (sheet.mode === 'editdaily') {
+      const d = dailies.find((x) => x.id === sheet.taskId);
+      if (d) { d.text = text; saveDaily(); render(); }
+    }
     closeSheet();
   });
 
-  $('list').addEventListener('click', (e) => {
+  // ---------- Menu kategorii ----------
+  let menuCat = null;
+  function openMenu(catId) {
+    const c = catById(catId);
+    if (!c) return;
+    menuCat = c.id;
+    const n = tasks.filter((t) => t.cat === c.id).length;
+    $('menuTitle').textContent = c.name;
+    $('menuDelete').textContent = n ? 'Usuń kategorię i ' + zadan(n) : 'Usuń kategorię';
+    $('menu').hidden = false;
+  }
+  function closeMenu() { $('menu').hidden = true; menuCat = null; }
+
+  $('menuCancel').addEventListener('click', closeMenu);
+  $('menuBackdrop').addEventListener('click', closeMenu);
+  $('menuRename').addEventListener('click', () => {
+    const id = menuCat;
+    closeMenu();
+    openSheet({ mode: 'renamecat', catId: id });
+  });
+  $('menuDelete').addEventListener('click', () => {
+    const c = catById(menuCat);
+    closeMenu();
+    if (!c) return;
+    const index = cats.indexOf(c);
+    const removed = tasks.filter((t) => t.cat === c.id).map((t) => Object.assign({}, t));
+    cats = cats.filter((x) => x !== c);
+    tasks = tasks.filter((t) => t.cat !== c.id);
+    saveCats(); save(); render();
+    toast('Usunięto „' + shortText(c.name) + '”' + (removed.length ? ' i ' + zadan(removed.length) : ''), () => {
+      cats.splice(Math.min(index, cats.length), 0, c);
+      tasks = tasks.concat(removed);
+      saveCats(); save(); render();
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!$('menu').hidden) closeMenu();
+    else if (!$('sheet').hidden) closeSheet();
+  });
+
+  // ---------- Dotknięcia na liście ----------
+  const lists = $('lists');
+
+  lists.addEventListener('click', (e) => {
     if (Date.now() < suppressClickUntil) return; // klik po zakończonym geście
+
+    const sec = e.target.closest('.cat');
+    if (e.target.closest('.cat-toggle')) {
+      if (sec.dataset.section === 'dailydone') {
+        dailyDoneCollapsed = !dailyDoneCollapsed;
+        lsSet(LS_DAILY_FOLD, dailyDoneCollapsed ? '1' : '0');
+        render();
+        return;
+      }
+      const c = catById(sec.dataset.cat);
+      if (c) { c.collapsed = !c.collapsed; saveCats(); render(); }
+      return;
+    }
+    if (e.target.closest('.cat-add')) { openSheet({ mode: 'add', catId: sec.dataset.cat }); return; }
+    if (e.target.closest('.cat-more')) { openMenu(sec.dataset.cat); return; }
+
     const li = e.target.closest('.item');
     if (!li) return;
+    if (li.dataset.kind === 'daily') {
+      const d = dailies.find((x) => x.id === li.dataset.id);
+      if (!d) return;
+      if (e.target.closest('.text')) openSheet({ mode: 'editdaily', taskId: d.id });
+      return;
+    }
     const t = tasks.find((x) => x.id === li.dataset.id);
     if (!t) return;
-    if (e.target.closest('.check')) {
-      setDone(t.id, !t.done);
-    }
+    if (e.target.closest('.text')) openSheet({ mode: 'edit', taskId: t.id });
   });
 
   // ---------- Gesty: przesunięcie w lewo / w prawo i przeciąganie za ≡ ----------
-  const list = $('list');
   let gesture = null;          // trwający gest: 'pending' | 'swipe' | 'drag'
   let suppressClickUntil = 0;
   let animating = false;       // trwa animacja odhaczania
 
-  function shortText(s) { return s.length > 28 ? s.slice(0, 28) + '…' : s; }
-
-  list.addEventListener('pointerdown', (e) => {
+  lists.addEventListener('pointerdown', (e) => {
     if (gesture || animating) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     const li = e.target.closest('.item');
@@ -483,7 +889,8 @@
   // Gest do końca: zadanie odjeżdża, tło na chwilę świeci (zielone / niebieskie / czerwone), wiersz się zwija.
   // W prawo = zrobione lub przywróć, w lewo = usuń.
   function completeBySwipe(g) {
-    const t = tasks.find((x) => x.id === g.li.dataset.id);
+    const isDaily = g.li.dataset.kind === 'daily';
+    const t = (isDaily ? dailies : tasks).find((x) => x.id === g.li.dataset.id);
     if (!t) { snapBack(g); return; }
     const toRight = g.dx > 0;
     animating = true;
@@ -497,6 +904,18 @@
     }, 450);
     setTimeout(() => {
       animating = false;
+      if (isDaily) {
+        if (!toRight) {
+          const copy = Object.assign({}, t);
+          removeDaily(t.id);
+          toast('Usunięto codzienne: „' + shortText(copy.text) + '”', () => addDaily(copy));
+          return;
+        }
+        const nowDone = !doneToday(t);
+        setDailyDone(t.id, nowDone);
+        toast((nowDone ? 'Zrobione na dziś: „' : 'Przywrócono: „') + shortText(t.text) + '”', () => setDailyDone(t.id, !nowDone));
+        return;
+      }
       if (!toRight) {
         const copy = Object.assign({}, t);
         removeTasks([t.id]);
@@ -509,21 +928,17 @@
     }, 700);
   }
 
+  // Przeciąganie działa w obrębie jednej listy (jednej kategorii)
   function startDrag(li, e) {
-    const items = Array.from(list.children);
+    const items = Array.from(li.parentElement.children).filter((el) => el.classList.contains('item'));
     const from = items.indexOf(li);
-    const isDone = li.classList.contains('done');
-    // Przeciągać można tylko w obrębie swojej grupy (do zrobienia / zrobione)
-    let lo = from, hi = from;
-    while (lo > 0 && items[lo - 1].classList.contains('done') === isDone) lo--;
-    while (hi < items.length - 1 && items[hi + 1].classList.contains('done') === isDone) hi++;
     const rects = items.map((el) => {
       const r = el.getBoundingClientRect();
       return { top: r.top + window.scrollY, h: r.height };
     });
     gesture = {
       type: 'drag', id: e.pointerId, li: li, items: items, from: from, to: from,
-      lo: lo, hi: hi, rects: rects, startY: e.clientY + window.scrollY, clientY: e.clientY
+      lo: 0, hi: items.length - 1, rects: rects, startY: e.clientY + window.scrollY, clientY: e.clientY
     };
     li.classList.add('dragging');
     items.forEach((el) => { if (el !== li) el.classList.add('shifting'); });
@@ -573,7 +988,8 @@
     cancelAnimationFrame(g.raf);
     if (!cancelled && g.to !== g.from) {
       const ids = g.items.slice(g.lo, g.hi + 1).map((el) => el.dataset.id);
-      moveTask(ids, g.from - g.lo, g.to - g.lo);
+      if (g.li.dataset.kind === 'daily') { moveItems(dailies, ids, g.from - g.lo, g.to - g.lo); saveDaily(); }
+      else { moveItems(tasks, ids, g.from - g.lo, g.to - g.lo); save(); }
     }
     render();
   }
@@ -597,14 +1013,30 @@
 
   // ---------- Start ----------
   const savedFilter = lsGet(LS_FILTER);
-  if (savedFilter === 'active' || savedFilter === 'done') filter = savedFilter;
+  if (savedFilter === 'active' || savedFilter === 'done' || savedFilter === 'daily') filter = savedFilter;
 
-  try {
-    $('today').textContent = new Date().toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
-  } catch (e) {}
+  function showDate() {
+    try {
+      $('today').textContent = new Date().toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
+    } catch (e) {}
+  }
 
+  showDate();
   load();
   render();
+
+  // Nowy dzień: codzienne zadania wracają same. Sprawdzamy co pół minuty
+  // i przy każdym powrocie do appki (np. rano, gdy była otwarta w tle przez noc).
+  let shownDay = today();
+  function checkNewDay() {
+    if (today() === shownDay) return;
+    shownDay = today();
+    showDate();
+    if (!gesture && !animating) render();
+  }
+  setInterval(checkNewDay, 30000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkNewDay(); });
+  window.addEventListener('focus', checkNewDay);
 
   // Prośba, by system nie czyścił zapisanych zadań
   if (navigator.storage && navigator.storage.persist) {

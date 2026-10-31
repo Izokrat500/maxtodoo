@@ -16,8 +16,21 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
 - Zadania są zapisywane w pamięci telefonu (`localStorage`, klucz `zadania-v1`). Nie ma serwera ani konta.
 - Każde zadanie ma pole `order` (mniejsza liczba = wyżej). Niezrobione są zawsze nad zrobionymi; zadanie nowe lub właśnie odhaczone trafia na górę swojej grupy.
 - Dwie zakładki: „Do zrobienia” (domyślna) i „Zrobione”. Nie ma widoku „Wszystkie” ani przycisku × do usuwania.
-- Zrobione zadania wyglądają jak niezrobione (bez przekreślenia), tylko z zielonym ptaszkiem w kółku.
-- Dodawanie: pod nagłówkiem jest tylko szeroki niebieski przycisk +; po dotknięciu otwiera się okienko „Nowe zadanie” (u góry ekranu, nad klawiaturą) z polem tekstowym oraz „Anuluj” / „Dodaj”.
+- Przy zadaniach nie ma klikalnego kółka — zadania odhacza się i usuwa wyłącznie gestami. Zrobione (zakładka „Zrobione” i „Zrobione dziś”) wyglądają jak niezrobione (bez przekreślenia), tylko z nieklikalnym zielonym ptaszkiem po lewej.
+- Dodawanie: pod nagłówkiem jest szeroki niebieski przycisk +; po dotknięciu otwiera się okienko „Nowe zadanie” (u góry ekranu, nad klawiaturą) z polem tekstowym, wyborem kategorii (chipy) oraz „Anuluj” / „Dodaj”.
+- Kategorie (localStorage `dodo-kategorie`: `{id, name, collapsed}`, zadanie ma pole `cat`):
+  - przycisk „+ Nowa kategoria” pod niebieskim przyciskiem,
+  - w „Do zrobienia”: najpierw zadania bez kategorii, potem zwijane sekcje (▾/▸ zapamiętane) z licznikiem, własnym „+” i menu „⋯” (zmień nazwę / usuń),
+  - usunięcie kategorii usuwa też jej zadania (z „Cofnij”),
+  - dotknięcie tekstu zadania otwiera okienko „Zadanie”: zmiana treści i przeniesienie do innej kategorii,
+  - przeciąganie za ≡ działa w obrębie jednej kategorii,
+  - „Zrobione” to jedna lista z szarym podpisem kategorii pod zadaniem.
+- Zakładka „Codzienne” (localStorage `dodo-codzienne`: `{id, text, order, doneDate}`):
+  - zadanie jest „zrobione”, gdy `doneDate` to dzisiejsza data lokalna (`RRRR-MM-DD`) — nowego dnia wraca samo, bez żadnego resetu,
+  - w prawo = zrobione na dziś (znika do zwijanej sekcji „Zrobione dziś”, stan zwinięcia w `dodo-codzienne-zwiniete`), w lewo = usuń na stałe, dotknięcie = zmiana treści,
+  - kolejność stała (nie zmienia się po odhaczeniu), przeciąganie za ≡; nowe na koniec; bez kategorii,
+  - zmiana dnia sprawdzana co 30 s oraz przy powrocie do appki (`visibilitychange`, `focus`),
+  - w tej zakładce niebieski + dodaje codzienne, przycisk „Nowa kategoria” jest ukryty, nagłówek pokazuje „Dziś zrobione: X z Y”.
 - Gesty (Pointer Events, działają też myszką), próg 35% szerokości wiersza, zawsze z „Cofnij”:
   - w prawo = odhacz (zielone tło); na zrobionym = przywróć (niebieskie tło),
   - w lewo = usuń (czerwone tło),
