@@ -340,9 +340,11 @@
   const LS_DAILY_FOLD = 'dodo-codzienne-zwiniete';
   const LS_GAME = 'dodo-gra';
 
-  // Grywalizacja: po północy za każde zrobione codzienne +5 monet, za każde niezrobione −1 HP
+  // Grywalizacja: monety od razu przy odhaczeniu (codzienne +1, z listy „Do zrobienia” +2),
+  // a po północy za każde niezrobione codzienne −1 HP
   const MAX_HP = 50;
-  const COINS_PER_DONE = 5;
+  const COINS_DAILY = 1;
+  const COINS_TASK = 2;
   const HP_PER_MISS = 1;
   let game = { hp: MAX_HP, coins: 0, settled: null }; // settled = ostatni rozliczony dzień
 
@@ -475,7 +477,7 @@
   function settleDays() {
     const t = today();
     let day = shiftDay(game.settled, 1);
-    const result = { days: 0, done: 0, total: 0, coins: 0, hp: 0, lastDay: null };
+    const result = { days: 0, done: 0, total: 0, hp: 0, lastDay: null };
     while (day < t) {
       for (const d of dailies) {
         if (d.createdDate > day) continue; // zadania jeszcze nie było
@@ -490,17 +492,14 @@
 
     const missed = result.total - result.done;
     const hpBefore = game.hp;
-    game.coins += result.done * COINS_PER_DONE;
     game.hp = Math.max(0, game.hp - missed * HP_PER_MISS);
     game.settled = shiftDay(t, -1);
     saveGame();
-    result.coins = result.done * COINS_PER_DONE;
     result.hp = game.hp - hpBefore;
     return result;
   }
 
   const ICON_HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5L12 21.2z" fill="#E5484D" stroke="#9E1F25" stroke-width="1.4"/></svg>';
-  const ICON_COIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#F5B301" stroke="#9A6A00" stroke-width="1.4"/><circle cx="12" cy="12" r="6.8" fill="#FFD84D" stroke="#C98F00" stroke-width="1.2"/><path d="M10.2 9h2.3a3 3 0 010 6h-2.3z" fill="none" stroke="#9A6A00" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 
   function showSummary(r) {
     const missed = r.total - r.done;
@@ -517,8 +516,7 @@
     if (game.hp === 0) text += ' Twój dodo nie ma już życia!';
     $('summaryText').textContent = text;
     $('summaryGains').innerHTML =
-      '<span class="gain">' + ICON_COIN + '+' + r.coins + '</span>' +
-      '<span class="gain">' + ICON_HEART + (r.hp < 0 ? '−' + Math.abs(r.hp) : '0') + '</span>';
+      '<span class="gain">' + ICON_HEART + (r.hp < 0 ? '−' + Math.abs(r.hp) + ' HP' : 'bez strat') + '</span>';
     $('summary').hidden = false;
   }
   $('summaryOk').addEventListener('click', () => {
@@ -542,9 +540,25 @@
   }
 
   function addDaily(d) { dailies.push(d); saveDaily(); render(); }
+  // Monety przyznawane od razu; cofnięcie odhaczenia je zabiera (żeby nie dało się ich nabijać)
+  function addCoins(n) {
+    game.coins = Math.max(0, game.coins + n);
+    saveGame();
+    renderProfile(true);
+  }
+  function monet(n) {
+    n = Math.abs(n);
+    const last = n % 10, last2 = n % 100;
+    if (n === 1) return '1 moneta';
+    if (last >= 2 && last <= 4 && (last2 < 12 || last2 > 14)) return n + ' monety';
+    return n + ' monet';
+  }
+
   function setDailyDone(id, done) {
     const d = dailies.find((x) => x.id === id);
-    if (d) { d.doneDate = done ? today() : null; saveDaily(); render(); }
+    if (!d) return;
+    if (doneToday(d) !== done) addCoins(done ? COINS_DAILY : -COINS_DAILY);
+    d.doneDate = done ? today() : null; saveDaily(); render();
   }
   function removeDaily(id) {
     dailies = dailies.filter((x) => x.id !== id); saveDaily(); render();
@@ -554,7 +568,9 @@
   function setDone(id, done) {
     const t = tasks.find((x) => x.id === id);
     // Zadanie trafia na górę swojej grupy (świeżo zrobione — na górę zrobionych)
-    if (t) { t.done = done; t.order = topOrder(); save(); render(); }
+    if (!t) return;
+    if (t.done !== done) addCoins(done ? COINS_TASK : -COINS_TASK);
+    t.done = done; t.order = topOrder(); save(); render();
   }
   function moveItems(arr, ids, from, to) {
     // ids: elementy jednej listy w obecnej kolejności; przenosimy pozycję from → to
@@ -1088,7 +1104,8 @@
         }
         const nowDone = !doneToday(t);
         setDailyDone(t.id, nowDone);
-        toast((nowDone ? 'Zrobione na dziś: „' : 'Przywrócono: „') + shortText(t.text) + '”', () => setDailyDone(t.id, !nowDone));
+        toast((nowDone ? 'Zrobione na dziś: „' : 'Przywrócono: „') + shortText(t.text) + '” · '
+          + (nowDone ? '+' : '−') + monet(COINS_DAILY), () => setDailyDone(t.id, !nowDone));
         return;
       }
       if (!toRight) {
@@ -1099,7 +1116,8 @@
       }
       const nowDone = !t.done;
       setDone(t.id, nowDone);
-      toast((nowDone ? 'Zrobione: „' : 'Przywrócono: „') + shortText(t.text) + '”', () => setDone(t.id, !nowDone));
+      toast((nowDone ? 'Zrobione: „' : 'Przywrócono: „') + shortText(t.text) + '” · '
+        + (nowDone ? '+' : '−') + monet(COINS_TASK), () => setDone(t.id, !nowDone));
     }, 700);
   }
 
