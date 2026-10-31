@@ -28,6 +28,8 @@
     --accent-fg: #FFFFFF;
     --danger: #D93A3A;
     --success: #2E9E5B;
+    --hp: #E5484D;
+    --coin: #B7791F;
     --done: #9AA0AD;
     --seg-bg: #E4E6ED;
     --seg-on: #FFFFFF;
@@ -41,7 +43,7 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #0E0F12; --card: #1B1D22; --fg: #F1F2F5; --muted: #9097A3; --line: #2A2D34;
-      --accent: #5B8DF5; --accent-fg: #0E0F12; --danger: #F06A6A; --success: #2FA862; --done: #6A707C;
+      --accent: #5B8DF5; --accent-fg: #0E0F12; --danger: #F06A6A; --success: #2FA862; --hp: #E5484D; --coin: #F2C14E; --done: #6A707C;
       --seg-bg: #23262C; --seg-on: #3A3E47; --shadow: none;
       color-scheme: dark;
     }
@@ -65,7 +67,25 @@
     gap: 16px;
   }
 
-  header { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; }
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-top: 8px; }
+  .head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+  /* Profil gracza: awatar, pasek życia i monety */
+  .profile { flex: none; width: 150px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 3px var(--card), 0 2px 8px rgba(22, 30, 60, .18); }
+  .avatar img { display: block; width: 100%; height: 100%; }
+  .stat { width: 100%; display: flex; align-items: center; gap: 6px; }
+  .stat-icon { flex: none; width: 20px; height: 20px; }
+  .hp-bar { position: relative; flex: 1; height: 12px; border-radius: 8px; background: var(--seg-bg); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .12); }
+  .hp-fill { position: absolute; inset: 0 auto 0 0; width: 100%; border-radius: 8px; background: linear-gradient(180deg, #FF7A7F, var(--hp)); transition: width .5s ease, background .3s; }
+  .hp-fill::after { content: ""; position: absolute; left: 4px; right: 4px; top: 2px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .35); }
+  .hp-bar.low .hp-fill { background: linear-gradient(180deg, #FFB25C, #E8781C); }
+  .hp-bar.critical .hp-fill { background: linear-gradient(180deg, #FF5A5F, #B4232A); animation: pulse 1.2s ease-in-out infinite; }
+  .hp-text { flex: none; min-width: 34px; text-align: right; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .coins { flex: 1; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bump { animation: bump .45s ease; }
+  @keyframes pulse { 50% { opacity: .65; } }
+  @keyframes bump { 40% { transform: scale(1.25); } }
   .date { margin: 0; color: var(--muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
   h1 { margin: 0; font-family: var(--font-display); font-size: 34px; font-weight: 700; letter-spacing: -.02em; text-wrap: balance; }
   .count { margin: 0; color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
@@ -115,6 +135,21 @@
   .menu-btn + .menu-btn { border-top: 1px solid var(--line); }
   .menu-btn.danger { color: var(--danger); }
   .menu-btn.strong { font-weight: 600; }
+
+  /* Okienko „Nowy dzień!” z rozliczeniem codziennych */
+  .summary {
+    position: fixed; inset: 0; z-index: 26; display: flex; align-items: center; justify-content: center;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .summary-card { position: relative; width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 20px 16px; background: var(--card); border-radius: 20px; box-shadow: 0 20px 50px rgba(0, 0, 0, .3); text-align: center; animation: pop .22s ease-out; }
+  .summary-card img { width: 72px; height: 72px; border-radius: 18px; }
+  .summary-title { margin: 0; font-family: var(--font-display); font-size: 24px; font-weight: 700; }
+  .summary-text { margin: 0; color: var(--muted); font-size: 15px; text-wrap: balance; }
+  .summary-gains { display: flex; gap: 10px; margin: 4px 0; }
+  .gain { display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 20px; background: var(--seg-bg); font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .gain svg { width: 22px; height: 22px; }
+  .summary-ok { width: 100%; height: 48px; margin-top: 6px; border-radius: 12px; background: var(--accent); color: var(--accent-fg); font-size: 17px; font-weight: 600; }
 
   .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--seg-bg); border-radius: 10px; padding: 2px; gap: 2px; }
   .seg button { height: 34px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--muted); transition: background .15s, color .15s; }
@@ -190,9 +225,33 @@
 
 <main class="app">
   <header>
-    <p class="date" id="today"></p>
-    <h1>Zadania</h1>
-    <p class="count" id="count">&nbsp;</p>
+    <div class="head-text">
+      <p class="date" id="today"></p>
+      <h1>Zadania</h1>
+      <p class="count" id="count">&nbsp;</p>
+    </div>
+    <div class="profile" aria-label="Twój profil">
+      <div class="avatar"><img src="icons/icon-180.png" alt="Twój dodo"></div>
+      <div class="stat" title="Życie">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 21.2 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5L12 21.2z" fill="#E5484D" stroke="#9E1F25" stroke-width="1.4"/>
+          <path d="M7.2 6.2c-1.3.3-2.2 1.4-2.3 2.7" fill="none" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div class="hp-bar" id="hpBar" role="meter" aria-label="Życie" aria-valuemin="0" aria-valuemax="50">
+          <div class="hp-fill" id="hpFill"></div>
+        </div>
+        <span class="hp-text" id="hpText">50/50</span>
+      </div>
+      <div class="stat" title="Monety">
+        <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="#F5B301" stroke="#9A6A00" stroke-width="1.4"/>
+          <circle cx="12" cy="12" r="6.8" fill="#FFD84D" stroke="#C98F00" stroke-width="1.2"/>
+          <path d="M10.2 9h2.3a3 3 0 010 6h-2.3z" fill="none" stroke="#9A6A00" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M6.6 8.4a6.3 6.3 0 012.6-2.4" fill="none" stroke="#FFFFFF" stroke-opacity=".75" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span class="coins" id="coins">0</span>
+      </div>
+    </div>
   </header>
 
   <div class="actions">
@@ -252,6 +311,18 @@
   </div>
 </div>
 
+<!-- Podsumowanie po północy -->
+<div class="summary" id="summary" hidden>
+  <div class="sheet-backdrop"></div>
+  <div class="summary-card" role="dialog" aria-modal="true" aria-labelledby="summaryTitle">
+    <img src="icons/icon-180.png" alt="">
+    <p class="summary-title" id="summaryTitle">Nowy dzień!</p>
+    <p class="summary-text" id="summaryText"></p>
+    <div class="summary-gains" id="summaryGains"></div>
+    <button class="summary-ok" id="summaryOk" type="button">Do dzieła!</button>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden>
   <div class="toast-inner">
     <span class="toast-msg" id="toastMsg"></span>
@@ -267,6 +338,13 @@
   const LS_FILTER = 'zadania-filtr';
   const LS_DAILY = 'dodo-codzienne';
   const LS_DAILY_FOLD = 'dodo-codzienne-zwiniete';
+  const LS_GAME = 'dodo-gra';
+
+  // Grywalizacja: po północy za każde zrobione codzienne +5 monet, za każde niezrobione −1 HP
+  const MAX_HP = 50;
+  const COINS_PER_DONE = 5;
+  const HP_PER_MISS = 1;
+  let game = { hp: MAX_HP, coins: 0, settled: null }; // settled = ostatni rozliczony dzień
 
   let tasks = [];
   let cats = [];   // kategorie w kolejności tworzenia: { id, name, collapsed }
@@ -280,6 +358,12 @@
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
   function doneToday(d) { return d.doneDate === today(); }
+  // Przesunięcie daty 'RRRR-MM-DD' o n dni
+  function shiftDay(s, n) {
+    const [y, m, d] = s.split('-').map(Number);
+    const dt = new Date(y, m - 1, d + n);
+    return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+  }
 
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
@@ -303,7 +387,9 @@
       id: String((raw && raw.id) || newId()),
       text: String((raw && raw.text) || '').slice(0, 200),
       order: Number(raw && raw.order) || 0,
-      doneDate: raw && raw.doneDate ? String(raw.doneDate) : null
+      doneDate: raw && raw.doneDate ? String(raw.doneDate) : null,
+      // Od tego dnia zadanie liczy się do rozliczenia (starsze zapisy: od dziś)
+      createdDate: raw && raw.createdDate ? String(raw.createdDate) : today()
     };
   }
   function cleanCat(raw) {
@@ -344,6 +430,17 @@
     try { list = JSON.parse(lsGet(LS_DAILY)) || []; } catch (e) {}
     dailies = Array.isArray(list) ? list.map(cleanDaily).filter((d) => d.text) : [];
     dailyDoneCollapsed = lsGet(LS_DAILY_FOLD) !== '0';
+    saveDaily(); // zapisuje createdDate starszym zadaniom
+
+    let g = null;
+    try { g = JSON.parse(lsGet(LS_GAME)); } catch (e) {}
+    game = {
+      hp: g && Number.isFinite(g.hp) ? Math.max(0, Math.min(MAX_HP, g.hp)) : MAX_HP,
+      coins: g && Number.isFinite(g.coins) ? Math.max(0, g.coins) : 0,
+      // Pierwsze uruchomienie: nic wstecz, pierwszym rozliczanym dniem będzie dzisiaj
+      settled: g && g.settled ? String(g.settled) : shiftDay(today(), -1)
+    };
+    saveGame();
     // Starsze zapisy nie miały kolejności — nadaj ją wg dotychczasowego układu (najnowsze na górze)
     if (tasks.some((t) => t.order === null)) {
       tasks.sort((a, b) => (a.done - b.done) || (b.createdAt - a.createdAt));
@@ -367,6 +464,83 @@
       toast('Nie udało się zapisać zmian w pamięci telefonu.');
     }
   }
+  function saveGame() {
+    if (!lsSet(LS_GAME, JSON.stringify(game))) {
+      toast('Nie udało się zapisać zmian w pamięci telefonu.');
+    }
+  }
+
+  // Rozlicza wszystkie zakończone dni od ostatniego rozliczenia do wczoraj.
+  // Zadanie liczy się jako zrobione danego dnia, gdy jego doneDate to ten dzień.
+  function settleDays() {
+    const t = today();
+    let day = shiftDay(game.settled, 1);
+    const result = { days: 0, done: 0, total: 0, coins: 0, hp: 0, lastDay: null };
+    while (day < t) {
+      for (const d of dailies) {
+        if (d.createdDate > day) continue; // zadania jeszcze nie było
+        result.total++;
+        if (d.doneDate === day) result.done++;
+      }
+      result.days++;
+      result.lastDay = day;
+      day = shiftDay(day, 1);
+    }
+    if (!result.days) return null;
+
+    const missed = result.total - result.done;
+    const hpBefore = game.hp;
+    game.coins += result.done * COINS_PER_DONE;
+    game.hp = Math.max(0, game.hp - missed * HP_PER_MISS);
+    game.settled = shiftDay(t, -1);
+    saveGame();
+    result.coins = result.done * COINS_PER_DONE;
+    result.hp = game.hp - hpBefore;
+    return result;
+  }
+
+  const ICON_HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.2 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5L12 21.2z" fill="#E5484D" stroke="#9E1F25" stroke-width="1.4"/></svg>';
+  const ICON_COIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#F5B301" stroke="#9A6A00" stroke-width="1.4"/><circle cx="12" cy="12" r="6.8" fill="#FFD84D" stroke="#C98F00" stroke-width="1.2"/><path d="M10.2 9h2.3a3 3 0 010 6h-2.3z" fill="none" stroke="#9A6A00" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+  function showSummary(r) {
+    const missed = r.total - r.done;
+    let text;
+    if (r.total === 0) {
+      text = 'Nie miałeś jeszcze codziennych zadań. Dodaj je w zakładce „Codzienne”, żeby zbierać monety.';
+    } else if (r.days === 1) {
+      text = 'Wczoraj zrobiłeś ' + r.done + ' z ' + r.total + ' codziennych zadań.'
+        + (missed === 0 ? ' Komplet, brawo!' : '');
+    } else {
+      const few = r.days % 10 >= 2 && r.days % 10 <= 4 && (r.days % 100 < 12 || r.days % 100 > 14);
+      text = 'Od ostatniej wizyty ' + (few ? 'minęły ' : 'minęło ') + r.days + ' dni. Zrobione: ' + r.done + ', pominięte: ' + missed + '.';
+    }
+    if (game.hp === 0) text += ' Twój dodo nie ma już życia!';
+    $('summaryText').textContent = text;
+    $('summaryGains').innerHTML =
+      '<span class="gain">' + ICON_COIN + '+' + r.coins + '</span>' +
+      '<span class="gain">' + ICON_HEART + (r.hp < 0 ? '−' + Math.abs(r.hp) : '0') + '</span>';
+    $('summary').hidden = false;
+  }
+  $('summaryOk').addEventListener('click', () => {
+    $('summary').hidden = true;
+    renderProfile(true);
+  });
+
+  function renderProfile(animate) {
+    const pct = Math.round((game.hp / MAX_HP) * 100);
+    $('hpFill').style.width = pct + '%';
+    $('hpText').textContent = game.hp + '/' + MAX_HP;
+    $('hpBar').setAttribute('aria-valuenow', String(game.hp));
+    $('hpBar').classList.toggle('low', game.hp <= MAX_HP * 0.5 && game.hp > MAX_HP * 0.2);
+    $('hpBar').classList.toggle('critical', game.hp <= MAX_HP * 0.2);
+    $('coins').textContent = game.coins;
+    if (animate) {
+      for (const el of [$('coins'), $('hpBar')]) {
+        el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+      }
+    }
+  }
+
   function addDaily(d) { dailies.push(d); saveDaily(); render(); }
   function setDailyDone(id, done) {
     const d = dailies.find((x) => x.id === id);
@@ -729,7 +903,7 @@
     } else if (sheet.mode === 'adddaily') {
       // Nowe codzienne trafia na koniec listy — kolejność dnia ustawiasz przeciąganiem
       const last = dailies.reduce((m, d) => Math.max(m, d.order), 0);
-      addDaily({ id: newId(), text: text, order: last + 1, doneDate: null });
+      addDaily({ id: newId(), text: text, order: last + 1, doneDate: null, createdDate: today() });
     } else if (sheet.mode === 'editdaily') {
       const d = dailies.find((x) => x.id === sheet.taskId);
       if (d) { d.text = text; saveDaily(); render(); }
@@ -775,7 +949,8 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (!$('menu').hidden) closeMenu();
+    if (!$('summary').hidden) $('summaryOk').click();
+    else if (!$('menu').hidden) closeMenu();
     else if (!$('sheet').hidden) closeSheet();
   });
 
@@ -1023,16 +1198,22 @@
 
   showDate();
   load();
+  const startSummary = settleDays();
   render();
+  renderProfile(false);
+  if (startSummary) showSummary(startSummary);
 
-  // Nowy dzień: codzienne zadania wracają same. Sprawdzamy co pół minuty
-  // i przy każdym powrocie do appki (np. rano, gdy była otwarta w tle przez noc).
+  // Nowy dzień: codzienne zadania wracają same, a poprzedni dzień zostaje rozliczony (monety / HP).
+  // Sprawdzamy co pół minuty i przy każdym powrocie do appki (np. rano, gdy była otwarta w tle przez noc).
   let shownDay = today();
   function checkNewDay() {
     if (today() === shownDay) return;
     shownDay = today();
     showDate();
+    const r = settleDays();
     if (!gesture && !animating) render();
+    renderProfile(false);
+    if (r) showSummary(r);
   }
   setInterval(checkNewDay, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) checkNewDay(); });

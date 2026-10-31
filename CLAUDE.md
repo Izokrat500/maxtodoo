@@ -31,6 +31,11 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
   - kolejność stała (nie zmienia się po odhaczeniu), przeciąganie za ≡; nowe na koniec; bez kategorii,
   - zmiana dnia sprawdzana co 30 s oraz przy powrocie do appki (`visibilitychange`, `focus`),
   - w tej zakładce niebieski + dodaje codzienne, przycisk „Nowa kategoria” jest ukryty, nagłówek pokazuje „Dziś zrobione: X z Y”.
+- Grywalizacja (localStorage `dodo-gra`: `{hp, coins, settled}`):
+  - w prawym górnym rogu profil: awatar (ikona dodo), pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
+  - po zakończeniu dnia: każde codzienne zrobione tego dnia (`doneDate === dzień`) = +5 monet, niezrobione = −1 HP; HP nie spada poniżej 0,
+  - `settleDays()` rozlicza wszystkie dni od `settled` + 1 do wczoraj (także kilka dni przerwy); zadanie liczy się dopiero od swojego `createdDate` (starsze zapisy dostają datę pierwszego uruchomienia tej wersji),
+  - po rozliczeniu okienko „Nowy dzień!” z podsumowaniem i zyskami/stratami; rozliczenie przy starcie appki i przy zmianie dnia (`checkNewDay`).
 - Gesty (Pointer Events, działają też myszką), próg 35% szerokości wiersza, zawsze z „Cofnij”:
   - w prawo = odhacz (zielone tło); na zrobionym = przywróć (niebieskie tło),
   - w lewo = usuń (czerwone tło),
