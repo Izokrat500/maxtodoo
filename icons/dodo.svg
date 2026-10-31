@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Logo appki Dodo: maskotka dodo z zielonym ptaszkiem „zrobione”. Źródło ikon PNG (patrz render_icons.ps1). -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4A84F5"/>
+      <stop offset="1" stop-color="#1E4FC4"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.32" cy="0.28" r="0.6">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Tło na cały kwadrat (iPhone sam zaokrągla rogi) -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <rect width="512" height="512" fill="url(#glow)"/>
+
+  <g transform="translate(256 256) scale(0.9) translate(-262 -262)" stroke="#141826" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+
+    <!-- Czubek z piór -->
+    <path d="M222 118 C210 86 236 70 250 94 C252 66 286 62 284 96 C298 78 322 92 304 116" fill="#ECE6DC"/>
+
+    <!-- Sylwetka: ciało, szyja i głowa -->
+    <path d="M-20 640 L-20 430 C20 368 88 346 140 336 C124 300 116 262 124 222 C136 140 200 102 264 106 C322 110 352 152 354 198 C356 236 338 266 312 288 C300 304 300 326 316 346 C382 382 424 452 440 640 Z" fill="#ECE6DC"/>
+
+    <!-- Skrzydło -->
+    <path d="M110 408 C160 372 246 378 292 420 C312 440 302 474 268 476 C232 484 186 474 150 456 C122 442 104 424 110 408 Z" fill="#CFC5B6"/>
+    <path d="M176 410 C200 420 214 438 218 458" fill="none" stroke-width="10"/>
+    <path d="M232 412 C252 424 262 440 264 460" fill="none" stroke-width="10"/>
+
+    <!-- Zielony ptaszek „zrobione” trzymany przy skrzydle -->
+    <circle cx="372" cy="430" r="64" fill="#2FB36A"/>
+    <path d="M342 430 L364 452 L404 408" fill="none" stroke="#FFFFFF" stroke-width="18"/>
+
+    <!-- Dziób: górna część z haczykiem -->
+    <path d="M296 166 C350 136 432 138 468 182 C498 218 496 270 470 294 C462 302 446 298 449 285 C454 262 446 246 424 240 C384 232 336 236 300 246 Z" fill="#FFC53D"/>
+    <path d="M454 194 C486 222 492 268 470 294 C462 302 446 298 449 285 C454 262 446 246 424 240 C436 228 448 212 454 194 Z" fill="#E8781C" stroke-width="10"/>
+    <!-- Dziób: dolna część -->
+    <path d="M300 246 C340 238 386 238 420 246 C412 268 380 286 340 286 C320 286 304 276 298 262 Z" fill="#F5A623"/>
+    <!-- Nozdrze -->
+    <ellipse cx="390" cy="184" rx="9" ry="6" fill="#141826" stroke="none"/>
+
+    <!-- Rumieniec -->
+    <ellipse cx="232" cy="236" rx="20" ry="11" fill="#FF8FA3" fill-opacity="0.65" stroke="none"/>
+
+    <!-- Oko -->
+    <ellipse cx="262" cy="182" rx="34" ry="40" fill="#FFFFFF"/>
+    <circle cx="274" cy="188" r="16" fill="#141826" stroke="none"/>
+    <circle cx="280" cy="180" r="5.5" fill="#FFFFFF" stroke="none"/>
+    <!-- Brew -->
+    <path d="M222 128 Q262 112 300 136" fill="none" stroke-width="13"/>
+  </g>
+</svg>

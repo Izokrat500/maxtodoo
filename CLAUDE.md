@@ -1,4 +1,4 @@
-# Zadania — lista zadań na iPhone'a
+# Dodo — lista zadań na iPhone'a
 
 Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początkowym (PWA).
 
@@ -10,7 +10,7 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
 - `index.html` — cała aplikacja: wygląd (CSS), logika (JavaScript) i treść w jednym pliku.
 - `manifest.webmanifest` — nazwa, kolory i ikony appki na ekranie początkowym.
 - `sw.js` — service worker: dzięki niemu appka działa offline. **Po każdej zmianie w plikach podnieś `VERSION` w `sw.js`**, inaczej iPhone pokaże starą wersję.
-- `icons/` — ikony PNG (180 px dla iPhone'a, 192 i 512 px dla manifestu), generowane skryptem `icons/make_icons.py`.
+- `icons/` — logo appki: źródło `dodo.svg` (maskotka dodo z zielonym ptaszkiem na niebieskim tle) i ikony PNG (180 px dla iPhone'a, 192 i 512 px dla manifestu), generowane przez `icons/render_icons.ps1` (Edge w trybie headless). Po zmianie SVG uruchom skrypt ponownie.
 
 ## Jak działa
 - Zadania są zapisywane w pamięci telefonu (`localStorage`, klucz `zadania-v1`). Nie ma serwera ani konta.
