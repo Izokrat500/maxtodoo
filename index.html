@@ -167,6 +167,15 @@
   .cat-add, .cat-more { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--accent); border-radius: 10px; }
   .cat-add svg, .cat-more svg { width: 22px; height: 22px; }
 
+  /* Przeciąganie kategorii: na ten czas wszystkie są zwinięte do samych nagłówków */
+  .cat-grip { flex: none; width: 36px; height: 44px; display: grid; place-items: center; color: var(--done); touch-action: none; cursor: grab; }
+  .cat-grip svg { width: 20px; height: 20px; }
+  .lists.cats-dragging .cat > .list { display: none; }
+  .cat.shifting { transition: transform .18s ease; }
+  .cat.dragging { z-index: 5; }
+  .cat.dragging .cat-head { background: var(--card); border-radius: 12px; box-shadow: 0 10px 28px rgba(0, 0, 0, .2); }
+  .cat.dragging .cat-grip { color: var(--fg); cursor: grabbing; }
+
   .list { list-style: none; margin: 0; padding: 0; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
   .empty-row { padding: 14px 16px; color: var(--muted); font-size: 15px; }
   .item { position: relative; background: var(--card); }
@@ -688,6 +697,15 @@
     more.innerHTML = ICON_MORE;
 
     head.append(toggle, add, more);
+    // Uchwyt ma sens dopiero, gdy jest co najmniej druga kategoria
+    if (cats.length > 1) {
+      const grip = document.createElement('button');
+      grip.className = 'cat-grip';
+      grip.type = 'button';
+      grip.setAttribute('aria-label', 'Przeciągnij, aby przenieść kategorię ' + c.name);
+      grip.innerHTML = ICON_GRIP;
+      head.append(grip);
+    }
     sec.append(head);
     if (!c.collapsed) sec.append(buildList(items, false, 'Brak zadań. Dotknij +, aby dodać.'));
     return sec;
@@ -1012,6 +1030,11 @@
   lists.addEventListener('pointerdown', (e) => {
     if (gesture || animating) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.target.closest('.cat-grip')) {
+      e.preventDefault();
+      startCatDrag(e.target.closest('.cat'), e);
+      return;
+    }
     const li = e.target.closest('.item');
     if (!li) return;
     if (e.target.closest('.grip')) {
@@ -1131,11 +1154,35 @@
     });
     gesture = {
       type: 'drag', id: e.pointerId, li: li, items: items, from: from, to: from,
-      lo: 0, hi: items.length - 1, rects: rects, startY: e.clientY + window.scrollY, clientY: e.clientY
+      lo: 0, hi: items.length - 1, rects: rects, gap: 0, startY: e.clientY + window.scrollY, clientY: e.clientY
     };
     li.classList.add('dragging');
     items.forEach((el) => { if (el !== li) el.classList.add('shifting'); });
     try { e.target.closest('.grip').setPointerCapture(e.pointerId); } catch (err) {}
+    gesture.raf = requestAnimationFrame(autoScroll);
+  }
+
+  // Przeciąganie kategorii: zwijamy wszystkie do nagłówków, żeby łatwo było przenieść nawet długą
+  function startCatDrag(sec, e) {
+    const grip = e.target.closest('.cat-grip');
+    const topBefore = sec.getBoundingClientRect().top;
+    lists.classList.add('cats-dragging');
+    // Po zwinięciu przewijamy tak, by nagłówek został pod palcem (o ile strona jest dość długa)
+    window.scrollBy(0, sec.getBoundingClientRect().top - topBefore);
+    const items = Array.from(lists.querySelectorAll(':scope > .cat'));
+    const from = items.indexOf(sec);
+    const rects = items.map((el) => {
+      const r = el.getBoundingClientRect();
+      return { top: r.top + window.scrollY, h: r.height };
+    });
+    gesture = {
+      type: 'drag', kind: 'cat', id: e.pointerId, li: sec, items: items, from: from, to: from,
+      lo: 0, hi: items.length - 1, rects: rects, gap: parseFloat(getComputedStyle(lists).rowGap) || 0,
+      startY: e.clientY + window.scrollY, clientY: e.clientY
+    };
+    sec.classList.add('dragging');
+    items.forEach((el) => { if (el !== sec) el.classList.add('shifting'); });
+    try { grip.setPointerCapture(e.pointerId); } catch (err) {}
     gesture.raf = requestAnimationFrame(autoScroll);
   }
 
@@ -1159,8 +1206,8 @@
     g.items.forEach((el, i) => {
       if (i === g.from) return;
       let shift = 0;
-      if (g.from < i && i <= to) shift = -me.h;
-      else if (to <= i && i < g.from) shift = me.h;
+      if (g.from < i && i <= to) shift = -(me.h + g.gap);
+      else if (to <= i && i < g.from) shift = me.h + g.gap;
       el.style.transform = shift ? 'translateY(' + shift + 'px)' : '';
     });
   }
@@ -1179,6 +1226,16 @@
 
   function endDrag(g, cancelled) {
     cancelAnimationFrame(g.raf);
+    if (g.kind === 'cat') {
+      lists.classList.remove('cats-dragging');
+      if (!cancelled && g.to !== g.from) {
+        const [moved] = cats.splice(g.from, 1);
+        cats.splice(g.to, 0, moved);
+        saveCats();
+      }
+      render();
+      return;
+    }
     if (!cancelled && g.to !== g.from) {
       const ids = g.items.slice(g.lo, g.hi + 1).map((el) => el.dataset.id);
       if (g.li.dataset.kind === 'daily') { moveItems(dailies, ids, g.from - g.lo, g.to - g.lo); saveDaily(); }

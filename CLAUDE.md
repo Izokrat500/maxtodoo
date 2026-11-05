@@ -23,7 +23,8 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
   - w „Do zrobienia”: najpierw zadania bez kategorii, potem zwijane sekcje (▾/▸ zapamiętane) z licznikiem, własnym „+” i menu „⋯” (zmień nazwę / usuń),
   - usunięcie kategorii usuwa też jej zadania (z „Cofnij”),
   - dotknięcie tekstu zadania otwiera okienko „Zadanie”: zmiana treści i przeniesienie do innej kategorii,
-  - przeciąganie za ≡ działa w obrębie jednej kategorii,
+  - przeciąganie zadania za ≡ działa w obrębie jednej kategorii,
+  - kategorie przesuwa się za ≡ w ich nagłówku (widoczny, gdy są co najmniej dwie); na czas przeciągania wszystkie zwijają się do nagłówków, a po puszczeniu wracają do swojego stanu; kolejność to kolejność w tablicy `dodo-kategorie`; zadania bez kategorii zostają zawsze na górze,
   - „Zrobione” to jedna lista z szarym podpisem kategorii pod zadaniem.
 - Zakładka „Codzienne” (localStorage `dodo-codzienne`: `{id, text, order, doneDate}`):
   - zadanie jest „zrobione”, gdy `doneDate` to dzisiejsza data lokalna (`RRRR-MM-DD`) — nowego dnia wraca samo, bez żadnego resetu,
