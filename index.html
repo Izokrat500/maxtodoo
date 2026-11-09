@@ -71,9 +71,11 @@
   .head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 
   /* Profil gracza: awatar, pasek życia i monety */
-  .profile { flex: none; width: 150px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 3px var(--card), 0 2px 8px rgba(22, 30, 60, .18); }
-  .avatar img { display: block; width: 100%; height: 100%; }
+  .profile { flex: none; width: 150px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .avatar-wrap { width: 112px; height: 112px; }
+  .hat-svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .avatar { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 3px var(--card), 0 2px 8px rgba(22, 30, 60, .18); }
+  .avatar svg { display: block; width: 100%; height: 100%; }
   .stat { width: 100%; display: flex; align-items: center; gap: 6px; }
   .stat-icon { flex: none; width: 20px; height: 20px; }
   .hp-bar { position: relative; flex: 1; height: 12px; border-radius: 8px; background: var(--seg-bg); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .12); }
@@ -151,8 +153,24 @@
   .gain svg { width: 22px; height: 22px; }
   .summary-ok { width: 100%; height: 48px; margin-top: 6px; border-radius: 12px; background: var(--accent); color: var(--accent-fg); font-size: 17px; font-weight: 600; }
 
-  .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--seg-bg); border-radius: 10px; padding: 2px; gap: 2px; }
-  .seg button { height: 34px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--muted); transition: background .15s, color .15s; }
+  /* Sklep z kapeluszami */
+  .shop-preview { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 16px 16px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); text-align: center; }
+  .shop-preview .avatar-wrap { width: 240px; height: 240px; max-width: 100%; }
+  .shop-preview-name { margin: 10px 0 0; font-family: var(--font-display); font-size: 20px; font-weight: 700; }
+  .shop-preview-note { margin: 0; color: var(--muted); font-size: 14px; }
+  .hat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .hat-card { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); }
+  .hat-card.previewed { box-shadow: 0 0 0 2px var(--accent); }
+  .hat-art { display: block; width: 100%; padding: 14px 18px 6px; border-radius: 10px; background: var(--seg-bg); }
+  .hat-name { margin: 0; min-height: 40px; font-size: 15px; font-weight: 600; line-height: 1.3; text-align: center; text-wrap: balance; }
+  .hat-action { display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border-radius: 10px; background: var(--accent); color: var(--accent-fg); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hat-action svg { width: 20px; height: 20px; }
+  .hat-action.owned { background: var(--seg-bg); color: var(--accent); }
+  .hat-action.worn { background: var(--success); color: #FFFFFF; }
+  .hat-action:disabled { background: var(--seg-bg); color: var(--muted); cursor: default; }
+
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--seg-bg); border-radius: 10px; padding: 2px; gap: 2px; }
+  .seg button { height: 34px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); transition: background .15s, color .15s; }
   .seg button[aria-selected="true"] { background: var(--seg-on); color: var(--fg); box-shadow: var(--shadow); }
 
   /* Listy: zadania bez kategorii na górze, potem zwijane kategorie */
@@ -240,7 +258,9 @@
       <p class="count" id="count">&nbsp;</p>
     </div>
     <div class="profile" aria-label="Twój profil">
-      <div class="avatar"><img src="icons/icon-180.png" alt="Twój dodo"></div>
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatar"></div>
+      </div>
       <div class="stat" title="Życie">
         <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 21.2 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5L12 21.2z" fill="#E5484D" stroke="#9E1F25" stroke-width="1.4"/>
@@ -263,7 +283,7 @@
     </div>
   </header>
 
-  <div class="actions">
+  <div class="actions" id="actions">
     <button class="add-btn" id="addBtn" type="button" aria-label="Dodaj zadanie" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
     </button>
@@ -277,6 +297,7 @@
     <button id="f-active" role="tab" data-filter="active" aria-selected="true">Do zrobienia</button>
     <button id="f-done" role="tab" data-filter="done" aria-selected="false">Zrobione</button>
     <button id="f-daily" role="tab" data-filter="daily" aria-selected="false">Codzienne</button>
+    <button id="f-shop" role="tab" data-filter="shop" aria-selected="false">Sklep</button>
   </div>
 
   <div class="lists" id="lists"></div>
@@ -357,7 +378,101 @@
   const HP_DAILY = 1;
   const HP_TASK = 2;
   const HP_PER_MISS = 1;
-  let game = { hp: MAX_HP, coins: 0, settled: null }; // settled = ostatni rozliczony dzień
+  let game = { hp: MAX_HP, coins: 0, settled: null, owned: [], hat: null }; // settled = ostatni rozliczony dzień, owned = kupione kapelusze, hat = noszony
+
+  // ---------- Kapelusze do sklepu: składane z prostych kształtów SVG ----------
+  const INK = '#141826';
+  const GOLD = '#E3B341';
+  const hatSvg = (inner) => '<svg class="hat-svg" viewBox="0 0 120 100" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">' + inner + '</svg>';
+
+  // Kształty kapeluszy
+  const tricorn = (main, dark, trim) =>
+    `<path d="M34 60C32 8 88 8 86 60Z" fill="${dark}"/>` +
+    `<path d="M4 54C22 40 36 48 60 44C84 48 98 40 116 54C104 64 78 78 60 90C42 78 16 64 4 54Z" fill="${main}"/>` +
+    `<path d="M15 55C30 48 42 53 60 50C78 53 90 48 105 55C94 63 75 72 60 81C45 72 26 63 15 55Z" stroke="${trim}" stroke-width="3"/>`;
+  const bicorn = (main, trim) =>
+    `<path d="M2 68C16 24 44 14 60 14C76 14 104 24 118 68C96 88 24 88 2 68Z" fill="${main}"/>` +
+    `<path d="M12 68C34 80 86 80 108 68" stroke="${trim}" stroke-width="5"/>` +
+    `<path d="M26 38C46 22 74 22 94 38" stroke="${trim}" stroke-width="3"/>`;
+  const cavalier = (main, dark, band) =>
+    `<path d="M38 68C36 30 44 18 60 18C76 18 84 30 82 68Z" fill="${dark}"/>` +
+    `<path d="M38 56C50 62 70 62 82 56L82 68C70 74 50 74 38 68Z" fill="${band}"/>` +
+    `<path d="M2 72C14 56 38 66 60 68C82 66 106 56 118 72C100 92 20 92 2 72Z" fill="${main}"/>`;
+  const capotain = (main, dark, band) =>
+    `<path d="M42 68L46 8C54 2 66 2 74 8L78 68Z" fill="${dark}"/>` +
+    `<path d="M42 52C52 58 68 58 78 52L79 68C68 73 52 73 41 68Z" fill="${band}"/>` +
+    `<rect x="51" y="53" width="18" height="16" rx="2" fill="${GOLD}"/><rect x="56" y="58" width="8" height="6" fill="${dark}" stroke-width="2.5"/>` +
+    `<path d="M8 76C26 64 94 64 112 76C94 90 26 90 8 76Z" fill="${main}"/>`;
+
+  // Ozdoby
+  const plume = (color, vein, flip) =>
+    `<g transform="${flip ? 'translate(120 0) scale(-1 1)' : 'translate(0 0)'}">` +
+    `<path d="M70 60C76 36 98 26 104 2C118 16 114 42 92 56C84 61 76 62 70 60Z" fill="${color}"/>` +
+    `<path d="M73 58C85 45 97 28 104 7M86 47L97 45M93 36L104 32" stroke="${vein}" stroke-width="2.5"/></g>`;
+  const tallPlume = (color, vein) =>
+    `<path d="M56 46C44 30 48 12 64 0C76 14 74 34 64 46Z" fill="${color}"/>` +
+    `<path d="M60 46C60 30 62 16 64 5" stroke="${vein}" stroke-width="2.5"/>`;
+  const raised = (inner) => `<g transform="translate(0 -10)">${inner}</g>`; // pióra wyżej, nad dwurogiem
+  const skull = (x, y) =>
+    `<g stroke-width="2.5"><path d="M${x - 9} ${y - 2}a9 9 0 1 1 18 0c0 5-3 6-4 7v4h-10v-4c-1-1-4-2-4-7z" fill="#F7F3E8"/>` +
+    `<circle cx="${x - 3.6}" cy="${y - 1}" r="2.5" fill="${INK}" stroke="none"/><circle cx="${x + 3.6}" cy="${y - 1}" r="2.5" fill="${INK}" stroke="none"/></g>`;
+  const bones = (x, y) =>
+    `<path d="M${x - 16} ${y - 9}L${x + 16} ${y + 11}M${x + 16} ${y - 9}L${x - 16} ${y + 11}" stroke-width="8"/>` +
+    `<path d="M${x - 16} ${y - 9}L${x + 16} ${y + 11}M${x + 16} ${y - 9}L${x - 16} ${y + 11}" stroke="#F7F3E8" stroke-width="4"/>`;
+  const gem = (x, y, color) => `<path d="M${x} ${y - 9}L${x + 8} ${y}L${x} ${y + 9}L${x - 8} ${y}Z" fill="${color}" stroke-width="3"/>`;
+  const cockade = (x, y, outer, inner) => `<circle cx="${x}" cy="${y}" r="11" fill="${outer}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="5" fill="${inner}" stroke-width="2.5"/>`;
+  const pearls = (points) => points.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.4" fill="#FDF8EE" stroke-width="1.6"/>`).join('');
+
+  const HATS = [
+    { id: 'korsarz', name: 'Trójróg Korsarza', price: 100,
+      svg: tricorn('#2A2F3D', '#1E222D', GOLD) + skull(60, 63) },
+    { id: 'bordo', name: 'Bordowy Kapitan', price: 150,
+      svg: bicorn('#7A1F3D', GOLD) + bones(60, 47) + skull(60, 47) },
+    { id: 'muszkieter', name: 'Szmaragdowy Muszkieter', price: 200,
+      svg: plume('#E5484D', '#9E1F25') + cavalier('#1F8A5B', '#145C3D', GOLD) },
+    { id: 'kawaler', name: 'Królewski Kawaler', price: 250,
+      svg: tallPlume('#FFFFFF', '#B8BEC9') + plume('#FFFFFF', '#B8BEC9') + cavalier('#2456C7', '#173C8F', '#F2F4F8') + gem(60, 65, '#E5484D') },
+    { id: 'hrabia', name: 'Purpurowy Hrabia', price: 300,
+      svg: plume('#F5C542', '#B7791F') + capotain('#6B2FA0', '#4A1F72', '#2A1740') },
+    { id: 'admiral', name: 'Szkarłatny Admirał', price: 400,
+      svg: raised(tallPlume('#FFFFFF', '#B8BEC9') + plume('#3B7BEA', '#1E4FC4')) + bicorn('#C8242B', '#F2C14E') + cockade(60, 48, '#FFFFFF', '#2456C7') },
+    { id: 'markiza', name: 'Turkusowa Markiza', price: 500,
+      svg: tallPlume('#FFD9EC', '#C2448A') + plume('#FF8FC7', '#C2448A') + cavalier('#18A6A0', '#0F7A76', '#FFD9EC') + pearls([[42, 66], [51, 69], [60, 70], [69, 69], [78, 66]]) },
+    { id: 'wicekrol', name: 'Złoty Wicekról', price: 650,
+      svg: tallPlume('#FFFFFF', '#B8BEC9') + tricorn('#E8B21F', '#C28F10', '#FFF3C4') + gem(60, 64, '#D6243A') },
+    { id: 'diuk', name: 'Różowy Diuk', price: 800,
+      svg: plume('#FF9A3D', '#C2600F', true) + tallPlume('#FFE066', '#C98F00') + plume('#3CCBDD', '#14899A') + cavalier('#EE3F91', '#B91F6B', '#FFD84D') + gem(60, 66, '#7A3FF2') },
+    { id: 'widmo', name: 'Widmowy Kapitan', price: 1000,
+      svg: raised(plume('#17A398', '#0B5F5A', true) + tallPlume('#8A4FE0', '#54259C') + plume('#17A398', '#0B5F5A')) + bicorn('#15171F', '#C9CED8') + bones(60, 48) + skull(60, 48) + pearls([[20, 72], [34, 76], [48, 78], [60, 79], [72, 78], [86, 76], [100, 72]]) }
+  ];
+  HATS.forEach((h) => { h.svg_html = hatSvg(h.svg); });
+  const hatById = (id) => HATS.find((h) => h.id === id) || null;
+
+  // Awatar: dodo i kapelusz narysowane razem, wszystko mieści się w kole
+  const DODO_AVATAR =
+    '<path d="M222 118C210 86 236 70 250 94C252 66 286 62 284 96C298 78 322 92 304 116" fill="#ECE6DC"/>' +
+    '<path d="M-200 700L-200 470C-100 400 88 346 140 336C124 300 116 262 124 222C136 140 200 102 264 106C322 110 352 152 354 198C356 236 338 266 312 288C300 304 300 326 316 346C382 382 424 452 440 700Z" fill="#ECE6DC"/>' +
+    '<path d="M110 408C160 372 246 378 292 420C312 440 302 474 268 476C232 484 186 474 150 456C122 442 104 424 110 408Z" fill="#CFC5B6"/>' +
+    '<path d="M176 410C200 420 214 438 218 458M232 412C252 424 262 440 264 460" fill="none" stroke-width="10"/>' +
+    '<path d="M296 166C350 136 432 138 468 182C498 218 496 270 470 294C462 302 446 298 449 285C454 262 446 246 424 240C384 232 336 236 300 246Z" fill="#FFC53D"/>' +
+    '<path d="M454 194C486 222 492 268 470 294C462 302 446 298 449 285C454 262 446 246 424 240C436 228 448 212 454 194Z" fill="#E8781C" stroke-width="10"/>' +
+    '<path d="M300 246C340 238 386 238 420 246C412 268 380 286 340 286C320 286 304 276 298 262Z" fill="#F5A623"/>' +
+    '<ellipse cx="390" cy="184" rx="9" ry="6" fill="#141826" stroke="none"/>' +
+    '<ellipse cx="232" cy="236" rx="20" ry="11" fill="#FF8FA3" fill-opacity="0.65" stroke="none"/>' +
+    '<ellipse cx="262" cy="182" rx="34" ry="40" fill="#FFFFFF"/>' +
+    '<circle cx="274" cy="188" r="16" fill="#141826" stroke="none"/><circle cx="280" cy="180" r="5.5" fill="#FFFFFF" stroke="none"/>' +
+    '<path d="M222 128Q262 112 300 136" fill="none" stroke-width="13"/>';
+
+  function avatarSvg(hat) {
+    // W kapeluszu dodo jest mniejszy i niżej, żeby nad głową było miejsce
+    const dodo = hat ? 'translate(67 159) scale(.72)' : 'translate(45 60) scale(.85)';
+    return '<svg viewBox="0 0 512 512" role="img" aria-label="Twój dodo' + (hat ? ' w kapeluszu: ' + hat.name : '') + '">' +
+      '<defs><linearGradient id="avatarBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A84F5"/><stop offset="1" stop-color="#1E4FC4"/></linearGradient></defs>' +
+      '<rect width="512" height="512" fill="url(#avatarBg)"/>' +
+      '<g transform="' + dodo + '" stroke="' + INK + '" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">' + DODO_AVATAR + '</g>' +
+      (hat ? '<g transform="translate(114 61) scale(2.1) rotate(-6 60 90)" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' + hat.svg + '</g>' : '') +
+      '</svg>';
+  }
 
   let tasks = [];
   let cats = [];   // kategorie w kolejności tworzenia: { id, name, collapsed }
@@ -453,8 +568,11 @@
       hp: g && Number.isFinite(g.hp) ? Math.max(0, Math.min(MAX_HP, g.hp)) : MAX_HP,
       coins: g && Number.isFinite(g.coins) ? Math.max(0, g.coins) : 0,
       // Pierwsze uruchomienie: nic wstecz, pierwszym rozliczanym dniem będzie dzisiaj
-      settled: g && g.settled ? String(g.settled) : shiftDay(today(), -1)
+      settled: g && g.settled ? String(g.settled) : shiftDay(today(), -1),
+      owned: g && Array.isArray(g.owned) ? g.owned.filter(hatById) : [],
+      hat: g && hatById(g.hat) ? g.hat : null
     };
+    if (!game.owned.includes(game.hat)) game.hat = null;
     saveGame();
     // Starsze zapisy nie miały kolejności — nadaj ją wg dotychczasowego układu (najnowsze na górze)
     if (tasks.some((t) => t.order === null)) {
@@ -545,6 +663,7 @@
     $('hpBar').classList.toggle('low', game.hp <= MAX_HP * 0.5 && game.hp > MAX_HP * 0.2);
     $('hpBar').classList.toggle('critical', game.hp <= MAX_HP * 0.2);
     $('coins').textContent = game.coins;
+    $('avatar').innerHTML = avatarSvg(hatById(game.hat));
     if (animate) {
       for (const el of [$('coins'), $('hpBar')]) {
         el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
@@ -732,6 +851,75 @@
     return sec;
   }
 
+  // ---------- Sklep ----------
+  const ICON_COIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#F5B301" stroke="#9A6A00" stroke-width="1.4"/><circle cx="12" cy="12" r="6.8" fill="#FFD84D" stroke="#C98F00" stroke-width="1.2"/><path d="M10.2 9h2.3a3 3 0 010 6h-2.3z" fill="none" stroke="#9A6A00" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  let previewHat = null; // kapelusz przymierzany w podglądzie (bez kupowania)
+
+  function renderShop(lists) {
+    const shown = hatById(previewHat || game.hat);
+    const preview = document.createElement('section');
+    preview.className = 'shop-preview';
+    const note = !shown ? 'Dotknij kapelusza, aby go przymierzyć.'
+      : game.hat === shown.id ? 'Masz go na głowie.'
+      : game.owned.includes(shown.id) ? 'Masz go w szafie.'
+      : 'Przymiarka za darmo · cena: ' + monet(shown.price);
+    preview.innerHTML =
+      '<div class="avatar-wrap"><div class="avatar">' + avatarSvg(shown) + '</div></div>' +
+      '<p class="shop-preview-name">' + (shown ? shown.name : 'Bez kapelusza') + '</p>' +
+      '<p class="shop-preview-note">' + note + '</p>';
+    lists.append(preview);
+
+    const grid = document.createElement('div');
+    grid.className = 'hat-grid';
+    for (const h of HATS) {
+      const owned = game.owned.includes(h.id);
+      const worn = game.hat === h.id;
+      let action;
+      if (worn) action = '<button class="hat-action worn" type="button" data-action="off">Zdejmij</button>';
+      else if (owned) action = '<button class="hat-action owned" type="button" data-action="wear">Załóż</button>';
+      else action = '<button class="hat-action" type="button" data-action="buy"' + (game.coins < h.price ? ' disabled' : '') + ' aria-label="Kup za ' + monet(h.price) + '">' + ICON_COIN + h.price + '</button>';
+      const card = document.createElement('div');
+      card.className = 'hat-card' + (previewHat === h.id ? ' previewed' : '');
+      card.dataset.hat = h.id;
+      card.innerHTML =
+        '<button class="hat-art" type="button" aria-label="Przymierz: ' + h.name + '">' + h.svg_html + '</button>' +
+        '<p class="hat-name">' + h.name + '</p>' + action;
+      grid.append(card);
+    }
+    lists.append(grid);
+  }
+
+  function buyHat(h) {
+    if (game.owned.includes(h.id) || game.coins < h.price) return;
+    const previous = game.hat;
+    game.coins -= h.price;
+    game.owned.push(h.id);
+    game.hat = h.id;
+    previewHat = null;
+    saveGame(); renderProfile(true); render();
+    toast('Kupiono: „' + h.name + '” · −' + monet(h.price), () => {
+      game.coins += h.price;
+      game.owned = game.owned.filter((id) => id !== h.id);
+      game.hat = previous;
+      saveGame(); renderProfile(true); render();
+    });
+  }
+
+  function shopClick(e) {
+    const card = e.target.closest('.hat-card');
+    if (!card) return;
+    const h = hatById(card.dataset.hat);
+    if (e.target.closest('.hat-art')) { previewHat = previewHat === h.id ? null : h.id; render(); return; }
+    const btn = e.target.closest('.hat-action');
+    if (!btn) return;
+    if (btn.dataset.action === 'buy') buyHat(h);
+    else {
+      game.hat = btn.dataset.action === 'wear' ? h.id : null;
+      previewHat = null;
+      saveGame(); renderProfile(false); render();
+    }
+  }
+
   // Sekcja „Zrobione dziś” w zakładce Codzienne — zwijana jak kategoria, bez + i ⋯
   function buildDailyDone(items) {
     const sec = document.createElement('section');
@@ -778,6 +966,17 @@
     const sorted = tasks.slice().sort(byOrder);
     const lists = $('lists');
     lists.textContent = '';
+
+    $('actions').hidden = filter === 'shop';
+    if (filter === 'shop') {
+      $('count').textContent = 'Kapelusze dla dodo';
+      renderShop(lists);
+      lists.hidden = false;
+      $('hint').hidden = true;
+      $('empty').hidden = true;
+      $('clearDone').hidden = true;
+      return;
+    }
 
     let shownCount;
     if (filter === 'daily') {
@@ -1014,6 +1213,7 @@
 
   lists.addEventListener('click', (e) => {
     if (Date.now() < suppressClickUntil) return; // klik po zakończonym geście
+    if (filter === 'shop') { shopClick(e); return; }
 
     const sec = e.target.closest('.cat');
     if (e.target.closest('.cat-toggle')) {
@@ -1280,13 +1480,14 @@
     const b = e.target.closest('button[data-filter]');
     if (!b) return;
     filter = b.dataset.filter;
+    previewHat = null;
     lsSet(LS_FILTER, filter);
     render();
   });
 
   // ---------- Start ----------
   const savedFilter = lsGet(LS_FILTER);
-  if (savedFilter === 'active' || savedFilter === 'done' || savedFilter === 'daily') filter = savedFilter;
+  if (['active', 'done', 'daily', 'shop'].includes(savedFilter)) filter = savedFilter;
 
   function showDate() {
     try {

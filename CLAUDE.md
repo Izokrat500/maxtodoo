@@ -15,7 +15,7 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
 ## Jak działa
 - Zadania są zapisywane w pamięci telefonu (`localStorage`, klucz `zadania-v1`). Nie ma serwera ani konta.
 - Każde zadanie ma pole `order` (mniejsza liczba = wyżej). Niezrobione są zawsze nad zrobionymi; zadanie nowe lub właśnie odhaczone trafia na górę swojej grupy.
-- Dwie zakładki: „Do zrobienia” (domyślna) i „Zrobione”. Nie ma widoku „Wszystkie” ani przycisku × do usuwania.
+- Cztery zakładki: „Do zrobienia” (domyślna), „Zrobione”, „Codzienne” i „Sklep”. Nie ma widoku „Wszystkie” ani przycisku × do usuwania.
 - Przy zadaniach nie ma klikalnego kółka — zadania odhacza się i usuwa wyłącznie gestami. Zrobione (zakładka „Zrobione” i „Zrobione dziś”) wyglądają jak niezrobione (bez przekreślenia), tylko z nieklikalnym zielonym ptaszkiem po lewej.
 - Dodawanie: pod nagłówkiem jest szeroki niebieski przycisk +; po dotknięciu otwiera się okienko „Nowe zadanie” (u góry ekranu, nad klawiaturą) z polem tekstowym, wyborem kategorii (chipy) oraz „Anuluj” / „Dodaj”.
 - Kategorie (localStorage `dodo-kategorie`: `{id, name, collapsed}`, zadanie ma pole `cat`):
@@ -33,12 +33,16 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
   - zmiana dnia sprawdzana co 30 s oraz przy powrocie do appki (`visibilitychange`, `focus`),
   - w tej zakładce niebieski + dodaje codzienne, przycisk „Nowa kategoria” jest ukryty, nagłówek pokazuje „Dziś zrobione: X z Y”.
 - Grywalizacja (localStorage `dodo-gra`: `{hp, coins, settled}`):
-  - w prawym górnym rogu profil: awatar (ikona dodo), pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
+  - w prawym górnym rogu profil: duży okrągły awatar dodo, pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
   - nagrody od razu przy odhaczeniu gestem (`applyReward` w `setDone` / `setDailyDone`): codzienne +1 moneta i +1 HP, z „Do zrobienia” +2 monety i +2 HP; przywrócenie / „Cofnij” zabiera je z powrotem (bez nabijania); usunięcie zrobionego zadania ich nie zabiera,
   - HP nie przekracza 50, dlatego zadanie pamięta w `hpGain`, ile serduszek faktycznie dało, i przy cofnięciu odejmowane jest dokładnie tyle,
   - życie: po zakończeniu dnia każde codzienne niezrobione tego dnia (`doneDate !== dzień`) = −1 HP; zadania z „Do zrobienia” nie odbierają życia; HP nie spada poniżej 0,
   - `settleDays()` rozlicza HP za wszystkie dni od `settled` + 1 do wczoraj (także kilka dni przerwy); zadanie liczy się dopiero od swojego `createdDate`,
   - po rozliczeniu okienko „Nowy dzień!” z podsumowaniem i stratą życia; rozliczenie przy starcie appki i przy zmianie dnia (`checkNewDay`).
+- Sklep (czwarta zakładka; `game.owned` = kupione, `game.hat` = noszony, w `dodo-gra`):
+  - 10 kapeluszy w tablicy `HATS` (ceny 100–1000 monet), rysowane w kodzie jako SVG z kształtów `tricorn` / `bicorn` / `cavalier` / `capotain` i ozdób (`plume`, `tallPlume`, `skull`, `bones`, `gem`, `cockade`, `pearls`),
+  - dotknięcie grafiki = darmowa przymiarka w podglądzie, przycisk = Kup / Załóż / Zdejmij; po zakupie „Cofnij” zwraca monety,
+  - awatar to jeden rysunek SVG z `avatarSvg(hat)`: dodo i kapelusz razem, wszystko mieści się w kole (w kapeluszu dodo jest mniejszy i niżej); koło ma 112 px w profilu i 240 px w sklepie.
 - Gesty (Pointer Events, działają też myszką), próg 35% szerokości wiersza, zawsze z „Cofnij”:
   - w prawo = odhacz (zielone tło); na zrobionym = przywróć (niebieskie tło),
   - w lewo = usuń (czerwone tło),
