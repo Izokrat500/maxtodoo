@@ -58,20 +58,79 @@
     gap: 16px;
   }
 
-  /* Góra ekranu: dodo na środku, tytuł zakładki, życie i monety; w tle gwiazdy */
-  .hero {
-    display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 12px; text-align: center;
-    background-image:
-      radial-gradient(1.5px 1.5px at 12% 22%, #F5E6C4, transparent), radial-gradient(1px 1px at 26% 62%, #8FA3C2, transparent),
-      radial-gradient(1.5px 1.5px at 40% 8%, #8FA3C2, transparent), radial-gradient(1px 1px at 68% 14%, #F5E6C4, transparent),
-      radial-gradient(1.5px 1.5px at 82% 46%, #F5E6C4, transparent), radial-gradient(1px 1px at 92% 18%, #8FA3C2, transparent),
-      radial-gradient(1px 1px at 6% 52%, #8FA3C2, transparent), radial-gradient(1.5px 1.5px at 74% 62%, #8FA3C2, transparent);
-  }
-  .avatar-wrap { width: 128px; height: 128px; margin-bottom: 6px; }
+  /* Góra ekranu: imię, życie i monety, pokład statku z dodo, tytuł zakładki */
+  .hero { display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
+  .top-row { display: flex; align-items: center; gap: 8px; }
+  .title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 6px; }
+  .title-row h1 { flex: none; font-size: 26px; white-space: nowrap; }
+  .title-info { min-width: 0; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+  .title-info p { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .title-info .date { font-size: 11px; }
+  .title-info .count { font-size: 13px; }
+
+  /* Scena: wybrane tło, postawione przedmioty i chodzące zwierzę */
+  .scene { position: relative; height: 196px; margin-inline: -16px; overflow: hidden; }
+  .bg-svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+  .scene-item { position: absolute; bottom: 6px; width: 54px; height: 54px; }
+  .scene-item svg { display: block; width: 100%; height: 100%; }
+  .pet { position: absolute; left: 0; bottom: 8px; z-index: 1; width: 133px; height: 170px; touch-action: manipulation; }
+  .sprite { width: 100%; height: 100%; }
+
+  .pet-name { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; max-width: 42%; color: var(--accent); font-size: 18px; font-weight: 700; }
+  .pet-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pet-name svg { flex: none; width: 16px; height: 16px; color: var(--muted); }
   .hat-svg { display: block; width: 100%; height: auto; overflow: visible; }
-  .avatar { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 3px var(--accent); }
-  .avatar svg { display: block; width: 100%; height: 100%; }
-  .stats { width: 100%; max-width: 340px; display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+
+  /* Żywy dodo */
+  .ava { display: block; width: 100%; height: 100%; overflow: visible; }
+  .ava.flipped { transform: scaleX(-1); }
+  .ava-all, .ava-dodo, .ava-hat, .ava-eye, .ava-brow, .ava-wing { transform-box: fill-box; }
+  .ava-all { transform-origin: 50% 100%; }
+  .ava-dodo { transform-origin: 50% 100%; }
+  .ava .ava-dodo { animation: breathe 3.4s ease-in-out infinite; }
+  .ava-still { display: block; width: 100%; height: auto; overflow: visible; }
+  .ava-still .ava-joy { display: none; }
+  .ava-hat { transform-origin: 50% 100%; }
+  .ava-wing { transform-origin: 30% 20%; }
+  .ava-look { transition: transform .2s ease-out; }
+  .ava-droop { transition: transform .5s ease; }
+  .ava.walking .ava-all { animation: walkBob .5s ease-in-out infinite; }
+  .ava.walking .leg-a { animation: stepA .5s ease-in-out infinite; }
+  .ava.walking .leg-b { animation: stepB .5s ease-in-out infinite; }
+  .ava.walking .ava-wing { animation: wingFlap .5s ease-in-out infinite; }
+  .ava-eye { transform-origin: 50% 50%; transition: transform .07s; }
+  .ava-eye.blink { transform: scaleY(.08); }
+  .ava-pupil { transition: transform .14s ease-out; }
+  .ava-brow { transform-origin: 50% 50%; transition: transform .3s; }
+  .ava-px { transition: transform .35s ease-out; }
+  .ava-joy { display: none; }
+  .ava.happy .ava-eye { display: none; }
+  .ava.happy .ava-joy { display: inline; }
+  .ava.sad .ava-dodo { animation: breatheSad 5s ease-in-out infinite; }
+  .ava.sad .ava-droop { transform: rotate(9deg); }
+  .ava.sad .ava-brow { transform: rotate(-14deg) translateY(7px); }
+  .ava.hop .ava-all { animation: hop .6s ease-out; }
+  .ava.hop .ava-hat { animation: hatHop .6s ease-out; }
+  @keyframes breathe { 50% { transform: scale(1.012, 1.02); } }
+  @keyframes breatheSad { 50% { transform: scale(1.004, 1.01); } }
+  @keyframes walkBob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 25%, 75% { transform: translateY(-10px); } 50% { transform: translateY(0) rotate(1.5deg); } }
+  @keyframes stepA { 0%, 100% { transform: rotate(22deg); } 50% { transform: rotate(-22deg); } }
+  @keyframes stepB { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(22deg); } }
+  @keyframes wingFlap { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(5deg); } }
+  @keyframes hop { 12% { transform: scale(1.05, .93); } 40% { transform: translateY(-60px) scale(.98, 1.04); } 70% { transform: none; } 82% { transform: scale(1.04, .96); } }
+  @keyframes hatHop { 28% { transform: translateY(-13px) rotate(-8deg); } 58% { transform: rotate(5deg); } 80% { transform: translateY(-2px) rotate(-2deg); } }
+
+  /* Dodo na cały ekran */
+  .pet-view { position: fixed; inset: 0; z-index: 24; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px calc(env(safe-area-inset-bottom, 0px) + 16px); background: var(--bg); text-align: center; animation: fade .18s ease-out; }
+  .pet-close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 8px); right: max(10px, env(safe-area-inset-right, 0px)); width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); }
+  .pet-close svg { width: 24px; height: 24px; }
+  .pet-stage { height: min(56vh, 460px); aspect-ratio: 640 / 870; max-width: 90vw; touch-action: none; cursor: grab; transition: transform .35s ease-out; }
+  .pet-floor { width: min(90vw, 420px); height: 12px; margin-bottom: 16px; border-radius: 6px; background: repeating-linear-gradient(90deg, #6B4A2E 0 46px, #5A3E27 46px 48px); border-top: 2px solid #8A6238; }
+  .pet-stage.dragging, .pet-stage.dragging .ava-px { transition: none; }
+  .pet-view-name { margin: 0; color: var(--title); font-family: var(--font-display); font-size: 28px; font-weight: 700; overflow-wrap: anywhere; }
+  .pet-mood { margin: 0; color: var(--accent); font-size: 16px; font-weight: 600; }
+  .pet-help { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+  .stats { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
   .stat { display: flex; align-items: center; gap: 6px; }
   .stat-hp { flex: 1; min-width: 0; }
   .stat-icon { flex: none; width: 22px; height: 22px; }
@@ -163,20 +222,27 @@
   .summary-ok { width: 100%; height: 48px; margin-top: 6px; border-radius: 12px; background: var(--accent); color: var(--accent-fg); font-size: 17px; font-weight: 600; }
 
   /* Sklep z kapeluszami */
-  .shop-preview { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 16px 16px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); text-align: center; }
-  .shop-preview .avatar-wrap { width: 240px; height: 240px; max-width: 100%; }
+  .shop-preview { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 8px 12px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); text-align: center; }
+  .shop-scene { position: relative; width: 100%; height: 214px; border-radius: 12px; overflow: hidden; }
+  .shop-pet { position: absolute; left: 50%; bottom: 8px; z-index: 1; width: 141px; height: 180px; transform: translateX(-50%); }
+  .shelves { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .shelf-tab { height: 40px; border-radius: 10px; background: var(--card); color: var(--muted); font-size: 12px; font-weight: 700; }
+  .shelf-tab[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
   .shop-preview-name { margin: 10px 0 0; font-family: var(--font-display); font-size: 20px; font-weight: 700; }
   .shop-preview-note { margin: 0; color: var(--muted); font-size: 14px; }
   .hat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .hat-card { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); }
   .hat-card.previewed { box-shadow: 0 0 0 2px var(--accent); }
   .hat-art { display: block; width: 100%; padding: 14px 18px 6px; border-radius: 10px; background: #B9CBE6; }
+  .hat-art.flush { position: relative; padding: 0; aspect-ratio: 400 / 196; overflow: hidden; }
+  .hat-art > svg:not(.hat-svg):not(.ava-still):not(.bg-svg) { display: block; width: 64%; margin: 0 auto 8px; }
   .hat-name { margin: 0; min-height: 40px; font-size: 15px; font-weight: 600; line-height: 1.3; text-align: center; text-wrap: balance; }
   .hat-action { display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border-radius: 10px; background: var(--accent); color: var(--accent-fg); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .hat-action svg { width: 20px; height: 20px; }
   .hat-action.owned { background: var(--seg-bg); color: var(--accent); }
   .hat-action.worn { background: var(--success); color: #FFFFFF; }
   .hat-action:disabled { background: var(--seg-bg); color: var(--muted); cursor: default; }
+  .hat-action.worn:disabled { background: var(--success); color: #FFFFFF; }
 
   /* Dolny pasek zakładek */
   .seg {
@@ -238,7 +304,6 @@
   .grip svg { width: 20px; height: 20px; }
   .item.dragging .grip { color: var(--fg); cursor: grabbing; }
 
-  .hint { margin: -6px 0 0; color: var(--muted); font-size: 13px; text-align: center; text-wrap: balance; }
   /* Zielony ptaszek przy zrobionych — tylko znaczek, nie da się go kliknąć */
   .status { flex: none; width: 24px; height: 24px; margin-right: 10px; border-radius: 50%; background: var(--success); color: #FFFFFF; display: grid; place-items: center; }
   .status svg { width: 14px; height: 14px; }
@@ -269,12 +334,11 @@
 
 <main class="app">
   <header class="hero">
-    <div class="avatar-wrap" id="heroAvatar">
-      <div class="avatar" id="avatar"></div>
-    </div>
-    <p class="date" id="today"></p>
-    <h1 id="pageTitle">Do zrobienia</h1>
-    <p class="count" id="count">&nbsp;</p>
+    <div class="top-row">
+    <button class="pet-name" id="petNameBtn" type="button" aria-label="Zmień imię dodo" aria-haspopup="dialog">
+      <span id="petName">Dodo</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>
+    </button>
     <div class="stats" aria-label="Twój profil">
       <div class="stat stat-hp" title="Życie">
         <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -294,6 +358,20 @@
           <path d="M6.6 8.4a6.3 6.3 0 012.6-2.4" fill="none" stroke="#FFFFFF" stroke-opacity=".75" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
         <span class="coins" id="coins">0</span>
+      </div>
+    </div>
+    </div>
+    <div class="scene" id="scene">
+      <div id="sceneArt"></div>
+      <button class="pet" id="heroAvatar" type="button" aria-label="Pokaż dodo na całym ekranie">
+        <div class="sprite" id="avatar"></div>
+      </button>
+    </div>
+    <div class="title-row">
+      <h1 id="pageTitle">Do zrobienia</h1>
+      <div class="title-info">
+        <p class="date" id="today"></p>
+        <p class="count" id="count">&nbsp;</p>
       </div>
     </div>
   </header>
@@ -329,8 +407,6 @@
   </nav>
 
   <div class="lists" id="lists"></div>
-  <p class="hint" id="hint" hidden></p>
-
   <div class="empty" id="empty">
     <p class="empty-title" id="emptyTitle"></p>
     <p class="empty-sub" id="emptySub"></p>
@@ -381,6 +457,18 @@
   </div>
 </div>
 
+<!-- Dodo na cały ekran -->
+<div class="pet-view" id="petView" role="dialog" aria-modal="true" aria-labelledby="petViewName" hidden>
+  <button class="pet-close" id="petClose" type="button" aria-label="Zamknij">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div class="pet-stage" id="petStage"></div>
+  <div class="pet-floor"></div>
+  <p class="pet-view-name" id="petViewName"></p>
+  <p class="pet-mood" id="petMood"></p>
+  <p class="pet-help">Dotknij, żeby podskoczył. Przesuń palcem, żeby go obrócić.</p>
+</div>
+
 <div class="toast" id="toast" hidden>
   <div class="toast-inner">
     <span class="toast-msg" id="toastMsg"></span>
@@ -406,7 +494,9 @@
   const HP_DAILY = 1;
   const HP_TASK = 2;
   const HP_PER_MISS = 1;
-  let game = { hp: MAX_HP, coins: 0, settled: null, owned: [], hat: null }; // settled = ostatni rozliczony dzień, owned = kupione kapelusze, hat = noszony
+  // settled = ostatni rozliczony dzień, owned = kupione kapelusze, hat = noszony, name = imię zwierzaka;
+  // ownedBg / ownedPets / ownedItems = pozostałe zakupy, bg = tło, pet = zwierzę, items = postawione przedmioty
+  let game = { hp: MAX_HP, coins: 0, settled: null, owned: [], hat: null, name: 'Dodo', ownedBg: [], bg: 'statek', ownedPets: [], pet: 'dodo', ownedItems: [], items: [] };
 
   // ---------- Kapelusze do sklepu: składane z prostych kształtów SVG ----------
   const INK = '#141826';
@@ -476,32 +566,178 @@
   HATS.forEach((h) => { h.svg_html = hatSvg(h.svg); });
   const hatById = (id) => HATS.find((h) => h.id === id) || null;
 
-  // Awatar: dodo i kapelusz narysowane razem, wszystko mieści się w kole
-  const DODO_AVATAR =
+  // Żywy dodo: cała postać rysowana w kodzie
+  // Oko, źrenica (patrzy za palcem), oko radości i brew są osobno, żeby można je było animować; wspólne dla wszystkich zwierząt
+  const EYE_PARTS =
+    '<g class="ava-eye"><ellipse cx="262" cy="182" rx="34" ry="40" fill="#FFFFFF"/>' +
+    '<g class="ava-pupil" style="transform:translate(12px,6px)"><circle cx="262" cy="182" r="16" fill="#141826" stroke="none"/><circle cx="268" cy="174" r="5.5" fill="#FFFFFF" stroke="none"/></g></g>' +
+    '<path class="ava-joy" d="M230 192Q262 146 294 192" fill="none" stroke-width="13"/>' +
+    '<path class="ava-brow" d="M222 128Q262 112 300 136" fill="none" stroke-width="13"/>';
+  const dodoLeg = (cls, x) =>
+    `<g transform="translate(${x} 530)"><g class="leg ${cls}"><path d="M-15 0L15 0L13 88L-13 88Z" fill="#F5A623"/>` +
+    '<path d="M-26 108C-28 86 40 78 62 102C68 110 62 114 54 114L-20 114C-25 114-26 112-26 108Z" fill="#FFC53D"/></g></g>';
+  // Tułów: ogon z piór, brzuch, skrzydło
+  const DODO_BODY =
+    '<path d="M60 440C10 400-40 400-50 360C-10 350 40 370 80 410Z" fill="#F7F3E8"/>' +
+    '<path d="M50 470C0 470-50 450-66 420C-30 400 30 420 70 450Z" fill="#F7F3E8"/>' +
+    '<path d="M70 410C40 370 10 340 20 300C55 310 90 360 100 395Z" fill="#F7F3E8"/>' +
+    '<path d="M140 336C90 344 28 392 28 452C28 524 112 566 212 566C322 566 402 514 398 444C396 402 362 370 316 346Z" fill="#ECE6DC"/>' +
+    '<g class="ava-wing"><path d="M110 408C160 372 246 378 292 420C312 440 302 474 268 476C232 484 186 474 150 456C122 442 104 424 110 408Z" fill="#CFC5B6"/>' +
+    '<path d="M176 410C200 420 214 438 218 458M232 412C252 424 262 440 264 460" fill="none" stroke-width="10"/></g>';
+  // Głowa z szyją: wypełnienie bez obrysu u dołu, żeby szyja płynnie łączyła się z tułowiem
+  const DODO_HEAD =
     '<path d="M222 118C210 86 236 70 250 94C252 66 286 62 284 96C298 78 322 92 304 116" fill="#ECE6DC"/>' +
-    '<path d="M-200 700L-200 470C-100 400 88 346 140 336C124 300 116 262 124 222C136 140 200 102 264 106C322 110 352 152 354 198C356 236 338 266 312 288C300 304 300 326 316 346C382 382 424 452 440 700Z" fill="#ECE6DC"/>' +
-    '<path d="M110 408C160 372 246 378 292 420C312 440 302 474 268 476C232 484 186 474 150 456C122 442 104 424 110 408Z" fill="#CFC5B6"/>' +
-    '<path d="M176 410C200 420 214 438 218 458M232 412C252 424 262 440 264 460" fill="none" stroke-width="10"/>' +
+    '<path d="M140 340C124 300 116 262 124 222C136 140 200 102 264 106C322 110 352 152 354 198C356 236 338 266 312 288C300 304 300 326 316 350L230 376Z" fill="#ECE6DC" stroke="none"/>' +
+    '<path d="M140 340C124 300 116 262 124 222C136 140 200 102 264 106C322 110 352 152 354 198C356 236 338 266 312 288C300 304 300 326 316 350" fill="none"/>' +
     '<path d="M296 166C350 136 432 138 468 182C498 218 496 270 470 294C462 302 446 298 449 285C454 262 446 246 424 240C384 232 336 236 300 246Z" fill="#FFC53D"/>' +
     '<path d="M454 194C486 222 492 268 470 294C462 302 446 298 449 285C454 262 446 246 424 240C436 228 448 212 454 194Z" fill="#E8781C" stroke-width="10"/>' +
     '<path d="M300 246C340 238 386 238 420 246C412 268 380 286 340 286C320 286 304 276 298 262Z" fill="#F5A623"/>' +
     '<ellipse cx="390" cy="184" rx="9" ry="6" fill="#141826" stroke="none"/>' +
     '<ellipse cx="232" cy="236" rx="20" ry="11" fill="#FF8FA3" fill-opacity="0.65" stroke="none"/>' +
-    '<ellipse cx="262" cy="182" rx="34" ry="40" fill="#FFFFFF"/>' +
-    '<circle cx="274" cy="188" r="16" fill="#141826" stroke="none"/><circle cx="280" cy="180" r="5.5" fill="#FFFFFF" stroke="none"/>' +
-    '<path d="M222 128Q262 112 300 136" fill="none" stroke-width="13"/>';
+    EYE_PARTS;
 
-  let avatarCount = 0;
-  function avatarSvg(hat) {
-    // W kapeluszu dodo jest mniejszy i niżej, żeby nad głową było miejsce
-    const dodo = hat ? 'translate(67 159) scale(.72)' : 'translate(45 60) scale(.85)';
-    const bgId = 'avatarBg' + (++avatarCount); // każdy awatar ma własne tło, bo ukryty awatar „gasi” wspólne
-    return '<svg viewBox="0 0 512 512" role="img" aria-label="Twój dodo' + (hat ? ' w kapeluszu: ' + hat.name : '') + '">' +
-      '<defs><linearGradient id="' + bgId + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A84F5"/><stop offset="1" stop-color="#1E4FC4"/></linearGradient></defs>' +
-      '<rect width="512" height="512" fill="url(#' + bgId + ')"/>' +
-      '<g transform="' + dodo + '" stroke="' + INK + '" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">' + DODO_AVATAR + '</g>' +
-      (hat ? '<g transform="translate(114 61) scale(2.1) rotate(-6 60 90)" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' + hat.svg + '</g>' : '') +
-      '</svg>';
+  // ---------- Zwierzęta: wspólny szablon ciała, różnią się kolorami, uszami, pyskiem i ogonem ----------
+  const BODY_SHAPE = 'M140 336C90 344 28 392 28 452C28 524 112 566 212 566C322 566 402 514 398 444C396 402 362 370 316 346Z';
+  const HEAD_SHAPE = 'M116 226C116 150 178 100 252 100C326 100 388 150 388 226C388 302 326 352 252 352C178 352 116 302 116 226Z';
+  const tailLine = (d, color, wide = 38, thin = 24) => `<path d="${d}" fill="none" stroke-width="${wide}"/><path d="${d}" fill="none" stroke="${color}" stroke-width="${thin}"/>`;
+  const muzzle = (cream, nose = '#2A1D18') =>
+    `<ellipse cx="326" cy="264" rx="62" ry="46" fill="${cream}" stroke="none"/><ellipse cx="374" cy="240" rx="15" ry="11" fill="${nose}" stroke="none"/>` +
+    '<path d="M372 252Q370 286 332 286" fill="none" stroke-width="8"/>';
+  const whiskers = '<path d="M336 246L268 234M336 262L266 268" fill="none" stroke-width="5"/>';
+  const STRIPE = '#1E1A1A';
+
+  function makePet(p) {
+    const legFill = p.legs || p.fur;
+    const footFill = p.foot || legFill;
+    return {
+      id: p.id, name: p.name, price: p.price,
+      leg: (cls, x) => `<g transform="translate(${x} 530)"><g class="leg ${cls}"><path d="M-22 0L22 0L20 88L-20 88Z" fill="${legFill}"/>` +
+        `<path d="M-30 108C-32 84 44 78 66 102C72 110 66 114 58 114L-24 114C-29 114-30 112-30 108Z" fill="${footFill}"/></g></g>`,
+      body: (p.tail || '') + `<path d="${BODY_SHAPE}" fill="${p.fur}"/>` +
+        (p.belly ? `<path d="M170 480C170 410 330 410 346 470C352 540 186 556 170 480Z" fill="${p.belly}" stroke="none"/>` : '') + (p.bodyMarks || '') +
+        `<g class="ava-wing"><path d="M112 420C146 396 192 420 192 472C192 514 148 524 126 502C104 480 98 440 112 420Z" fill="${p.arm || p.fur}"/></g>`,
+      head: (p.ears || '') + `<path d="${HEAD_SHAPE}" fill="${p.head || p.fur}"/>` + (p.marks || '') + EYE_PARTS + (p.face || '')
+    };
+  }
+
+  const PETS = [
+    { id: 'dodo', name: 'Dodo', price: 0, leg: dodoLeg, body: DODO_BODY, head: DODO_HEAD },
+    makePet({ id: 'mysz', name: 'Mysz', price: 2000, fur: '#B9B8C6', belly: '#E4E3EC', foot: '#F2A7B5',
+      tail: tailLine('M40 480C-30 490-70 440-40 380', '#F2A7B5', 22, 10),
+      ears: '<circle cx="140" cy="118" r="78" fill="#B9B8C6"/><circle cx="140" cy="118" r="46" fill="#F2A7B5" stroke="none"/><circle cx="346" cy="110" r="78" fill="#B9B8C6"/><circle cx="346" cy="110" r="46" fill="#F2A7B5" stroke="none"/>',
+      face: muzzle('#E4E3EC', '#F2798E') + whiskers + '<path d="M344 290L344 312L362 312L362 288Z" fill="#FFFFFF" stroke-width="5"/>' }),
+    makePet({ id: 'krolik', name: 'Królik', price: 2500, fur: '#F2EEE8', belly: '#FFFFFF', foot: '#F2EEE8',
+      tail: '<circle cx="34" cy="470" r="44" fill="#FFFFFF"/>',
+      ears: '<path d="M170 130C140 30 158 -80 202 -80C246 -80 240 40 226 120Z" fill="#F2EEE8"/><path d="M186 110C170 40 180 -50 200 -50C222 -50 218 40 210 106Z" fill="#F7B8C6" stroke="none"/><path d="M270 118C266 30 290 -74 330 -66C368 -58 344 50 322 130Z" fill="#F2EEE8"/><path d="M288 110C290 40 304 -40 326 -38C346 -34 330 50 314 116Z" fill="#F7B8C6" stroke="none"/>',
+      face: muzzle('#FFFFFF', '#F2798E') + whiskers }),
+    makePet({ id: 'papuga', name: 'Papuga', price: 3000, fur: '#E5403A', belly: '#F7C948', arm: '#2F6FD6', legs: '#6E7487', foot: '#6E7487',
+      tail: '<path d="M60 440C10 460-60 520-70 590C-30 570 40 530 80 480Z" fill="#2F6FD6"/><path d="M70 470C30 500-20 570-10 640C20 610 80 560 110 510Z" fill="#F7C948"/>',
+      marks: '<ellipse cx="292" cy="192" rx="72" ry="64" fill="#F7F3E8" stroke="none"/>',
+      face: '<path d="M318 180C384 156 438 196 426 256C422 280 400 274 402 256C402 236 384 232 320 244Z" fill="#2A2A33"/><path d="M322 244C352 238 384 240 398 250C390 276 352 288 330 276Z" fill="#454552"/>' }),
+    makePet({ id: 'pies', name: 'Pies', price: 3500, fur: '#B57A45', belly: '#EAD5B5', foot: '#EAD5B5',
+      tail: tailLine('M44 450C0 430-30 380-20 330', '#B57A45'),
+      marks: '<path d="M176 128C120 130 84 226 112 300C138 312 176 250 204 172Z" fill="#7A4E29"/>',
+      face: muzzle('#EAD5B5') + '<path d="M336 288C336 326 378 326 378 286Z" fill="#FF7A8A" stroke-width="8"/>' }),
+    makePet({ id: 'kot', name: 'Kot', price: 4000, fur: '#7E8799', belly: '#D5D9E3',
+      tail: tailLine('M40 470C-40 470-60 390-20 350C10 330 34 356 14 376', '#7E8799'),
+      ears: '<path d="M140 170L126 56L228 116Z" fill="#7E8799"/><path d="M160 150L150 86L208 120Z" fill="#F7B8C6" stroke="none"/><path d="M280 112L376 52L368 170Z" fill="#7E8799"/><path d="M302 116L358 84L352 148Z" fill="#F7B8C6" stroke="none"/>',
+      face: muzzle('#D5D9E3', '#F2798E') + whiskers }),
+    makePet({ id: 'lis', name: 'Lis', price: 5000, fur: '#E8702A', belly: '#FFF3E0', foot: '#2A1D18', legs: '#2A1D18',
+      tail: '<path d="M60 470C-40 500-90 400-30 330C10 370 70 400 80 440Z" fill="#E8702A"/><path d="M-6 440C-40 420-50 370-30 332C-10 352 14 372 34 384Z" fill="#FFF3E0"/>',
+      ears: '<path d="M140 176L120 50L232 116Z" fill="#E8702A"/><path d="M128 100L120 50L170 80Z" fill="#2A1D18" stroke="none"/><path d="M278 112L386 48L370 176Z" fill="#E8702A"/><path d="M340 74L386 48L378 96Z" fill="#2A1D18" stroke="none"/>',
+      face: muzzle('#FFF3E0') + whiskers }),
+    makePet({ id: 'pingwin', name: 'Pingwin', price: 6000, fur: '#1F2A44', belly: '#FFFFFF', arm: '#1F2A44', legs: '#F5A623', foot: '#F5A623',
+      marks: '<ellipse cx="282" cy="240" rx="88" ry="96" fill="#FFFFFF" stroke="none"/>',
+      face: '<path d="M334 232C372 218 410 240 416 256C396 276 356 280 332 266Z" fill="#F5A623"/>' }),
+    makePet({ id: 'tygrys', name: 'Tygrys', price: 7000, fur: '#F2902E', belly: '#FFF1DC',
+      tail: tailLine('M40 470C-40 480-70 410-40 350', '#F2902E'),
+      ears: '<circle cx="158" cy="128" r="44" fill="#F2902E"/><circle cx="158" cy="128" r="22" fill="#2A1D18" stroke="none"/><circle cx="346" cy="126" r="44" fill="#F2902E"/><circle cx="346" cy="126" r="22" fill="#2A1D18" stroke="none"/>',
+      marks: `<path d="M190 118L208 160M240 102L242 146M286 106L276 148M128 226L168 236M126 266L164 264" fill="none" stroke="${STRIPE}" stroke-width="13"/>`,
+      bodyMarks: `<path d="M82 408L124 430M58 458L104 468M90 522L130 508M360 430L322 446M372 482L332 486" fill="none" stroke="${STRIPE}" stroke-width="13"/>`,
+      face: muzzle('#FFF1DC') + whiskers }),
+    makePet({ id: 'panda', name: 'Panda', price: 8500, fur: '#F7F3E8', legs: '#22242C', foot: '#22242C', arm: '#22242C',
+      tail: '<circle cx="34" cy="470" r="34" fill="#F7F3E8"/>',
+      ears: '<circle cx="150" cy="122" r="50" fill="#22242C"/><circle cx="350" cy="122" r="50" fill="#22242C"/>',
+      marks: '<ellipse cx="262" cy="190" rx="60" ry="68" fill="#22242C" stroke="none" transform="rotate(14 262 190)"/>',
+      face: muzzle('#FFFFFF') }),
+    makePet({ id: 'smok', name: 'Smok', price: 10000, fur: '#3FA66B', belly: '#CDE89A', arm: '#7A4FD6', foot: '#2E7D4F',
+      tail: '<path d="M60 430C0 440-70 480-96 560L-40 540L-30 588C20 560 70 510 90 470Z" fill="#3FA66B"/><path d="M44 372L14 328L78 348ZM22 410L-26 384L40 382Z" fill="#F5C542"/>',
+      ears: '<path d="M170 128L142 30L228 106Z" fill="#F5C542"/><path d="M280 106L364 28L338 132Z" fill="#F5C542"/>',
+      face: '<ellipse cx="326" cy="264" rx="66" ry="50" fill="#CDE89A" stroke="none"/><ellipse cx="370" cy="240" rx="8" ry="6" fill="#141826" stroke="none"/><path d="M386 262Q356 296 306 290" fill="none" stroke-width="8"/><path d="M340 292L348 310L358 290" fill="#FFFFFF" stroke-width="5"/>' })
+  ];
+  const petById = (id) => PETS.find((p) => p.id === id) || PETS[0];
+
+  // ---------- Tła sceny: ziemia zawsze zaczyna się na wysokości 162 z 196 ----------
+  const dots = (list, color, r) => list.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}"/>`).join('');
+  const NIGHT_STARS = [[30, 30], [90, 60], [150, 20], [220, 50], [260, 22], [320, 72], [60, 100], [180, 92], [350, 110]];
+  const planks = (color) => [48, 96, 144, 192, 240, 288, 336, 384].map((x) => `<rect x="${x}" y="162" width="2" height="34" fill="${color}"/>`).join('');
+  const BGS = [
+    { id: 'statek', name: 'Nocny statek', price: 0, svg: '<rect width="400" height="196" fill="#0D1B33"/>' + dots(NIGHT_STARS, '#F5E6C4', 1.2) +
+      '<circle cx="345" cy="38" r="19" fill="#F5E6C4"/><circle cx="338" cy="35" r="17" fill="#0D1B33" opacity=".14"/><rect y="132" width="400" height="30" fill="#16345F"/><rect y="162" width="400" height="34" fill="#6B4A2E"/><rect y="162" width="400" height="3" fill="#8A6238"/>' + planks('#5A3E27') },
+    { id: 'wyspa', name: 'Tropikalna wyspa', price: 100, svg: '<rect width="400" height="196" fill="#7FD4F0"/><circle cx="340" cy="36" r="22" fill="#FFE27A"/><rect y="104" width="400" height="60" fill="#1FA6C9"/><path d="M270 110Q320 76 380 110Z" fill="#3FA66B"/><path d="M0 164Q200 138 400 164V196H0Z" fill="#F2D58C"/><rect y="170" width="400" height="26" fill="#EBC878"/>' +
+      '<path d="M50 170C54 130 60 100 74 74L84 78C72 106 68 134 66 170Z" fill="#8A5A2E"/><path d="M78 76C50 56 26 60 12 80C40 70 60 74 78 76ZM78 76C66 46 44 34 22 36C46 48 62 60 78 76ZM78 76C92 48 116 40 134 48C110 54 94 62 78 76ZM78 76C104 66 128 74 138 96C116 82 96 78 78 76Z" fill="#2E9E5B"/>' },
+    { id: 'pustynia', name: 'Złota pustynia', price: 150, svg: '<rect width="400" height="196" fill="#F7C680"/><circle cx="90" cy="48" r="30" fill="#FFF1B8"/><path d="M230 140L290 60L350 140Z" fill="#C98A3D"/><path d="M290 60L350 140L310 140Z" fill="#A9702E"/><path d="M0 140Q100 96 210 140T400 130V196H0Z" fill="#E9A95C"/><path d="M0 164Q120 146 400 164V196H0Z" fill="#E6B56C"/>' +
+      '<path d="M340 166V112a10 10 0 0120 0V166ZM340 140H324V124M360 134H376V118" fill="#2E8B57" stroke="#2E8B57" stroke-width="7" stroke-linecap="round"/>' },
+    { id: 'zima', name: 'Zimowa kraina', price: 200, svg: '<rect width="400" height="196" fill="#BFD9F2"/><path d="M0 130Q90 80 200 130T400 120V196H0Z" fill="#E4EFF9"/>' +
+      ['60', '130', '320'].map((x) => `<path d="M${x} 60L${+x + 32} 120H${+x + 16}L${+x + 40} 160H${+x - 40}L${+x - 16} 120H${+x - 32}Z" fill="#2F6B55"/><path d="M${x} 60L${+x + 16} 90H${+x - 16}Z" fill="#FFFFFF"/>`).join('') +
+      '<rect y="162" width="400" height="34" fill="#F4F8FC"/>' + dots([[40, 30], [120, 50], [200, 24], [260, 64], [370, 40], [90, 90], [240, 110], [350, 100]], '#FFFFFF', 2.6) },
+    { id: 'las', name: 'Zaczarowany las', price: 300, svg: '<rect width="400" height="196" fill="#9EDCA8"/><path d="M0 110Q60 40 130 96T260 90T400 100V196H0Z" fill="#3E8E5A"/>' +
+      [[40, 24], [340, 30]].map(([x, s]) => `<rect x="${x - 10}" y="90" width="20" height="74" fill="#6B4A2E"/><circle cx="${x}" cy="${s + 56}" r="44" fill="#2E7D4F"/>`).join('') +
+      '<rect y="162" width="400" height="34" fill="#5D8C3E"/><path d="M200 164V150h8v14Z" fill="#F7F3E8"/><path d="M192 152a12 12 0 0124 0Z" fill="#E5403A"/><path d="M280 170v-12h6v12Z" fill="#F7F3E8"/><path d="M274 160a9 9 0 0118 0Z" fill="#E5403A"/>' },
+    { id: 'wulkan', name: 'Ognisty wulkan', price: 400, svg: '<rect width="400" height="196" fill="#3B1D2E"/>' + dots([[80, 40], [150, 70], [300, 30], [350, 80], [40, 90]], '#FF9A3D', 2) +
+      '<path d="M90 164L170 50H230L310 164Z" fill="#4A2B2B"/><path d="M170 50H230L214 88C204 78 196 96 186 84Z" fill="#FF7A2E"/><path d="M200 84C196 110 214 130 204 164H190C200 130 184 110 192 84Z" fill="#FF7A2E"/><rect y="162" width="400" height="34" fill="#3A2A2A"/><path d="M40 178Q70 170 110 178M270 184Q310 176 360 182" fill="none" stroke="#FF7A2E" stroke-width="3"/>' },
+    { id: 'rafa', name: 'Podwodna rafa', price: 500, svg: '<rect width="400" height="196" fill="#1272A8"/><path d="M60 0L120 196H40ZM250 0L330 196H230Z" fill="#FFFFFF" opacity=".08"/>' + dots([[100, 60], [110, 40], [290, 90], [300, 64], [210, 30]], '#CFEFFF', 4) +
+      '<path d="M40 164C40 130 20 120 30 96C50 110 60 130 60 164ZM340 164C340 120 370 110 360 84C340 100 330 130 326 164Z" fill="#2E9E5B"/><path d="M90 164C80 140 100 130 96 112M90 164C100 140 120 140 124 122M90 164C76 150 64 148 58 132" fill="none" stroke="#FF7AA2" stroke-width="7" stroke-linecap="round"/><path d="M180 70l18-10v20zM180 70a16 10 0 10-30 0 16 10 0 1030 0" fill="#F7C948"/><rect y="162" width="400" height="34" fill="#E8D49A"/>' },
+    { id: 'zamek', name: 'Zamek o zmroku', price: 650, svg: '<rect width="400" height="196" fill="#2A2350"/>' + dots(NIGHT_STARS, '#F5E6C4', 1.2) + '<circle cx="70" cy="44" r="20" fill="#F5E6C4"/>' +
+      '<path d="M210 164V90h14V76h12v14h14V76h12v14h14v30h26V76h12v14h14V76h12v14h12V164Z" fill="#4A4A6A"/><path d="M236 60l14-24 14 24ZM322 60l14-24 14 24Z" fill="#7A3FF2"/><rect x="240" y="110" width="12" height="18" fill="#FFD84D"/><rect x="326" y="110" width="12" height="18" fill="#FFD84D"/><path d="M276 164v-22a10 10 0 0120 0v22Z" fill="#2A2350"/><rect y="162" width="400" height="34" fill="#3F5A3A"/>' },
+    { id: 'ogrod', name: 'Ogród sakury', price: 800, svg: '<rect width="400" height="196" fill="#FFDDE6"/><circle cx="330" cy="50" r="26" fill="#F2798E"/><rect y="130" width="400" height="34" fill="#BFE3F0"/>' +
+      '<path d="M238 164V70h12V164ZM318 164V70h12V164Z" fill="#D6243A"/><path d="M216 60Q284 44 352 60L346 76Q284 62 222 76Z" fill="#D6243A"/><rect x="232" y="88" width="104" height="9" fill="#D6243A"/>' +
+      '<path d="M50 166C54 120 50 90 80 60" fill="none" stroke="#6B4A2E" stroke-width="10" stroke-linecap="round"/><circle cx="80" cy="54" r="34" fill="#FFB7CC"/><circle cx="46" cy="76" r="26" fill="#FFC9D9"/><circle cx="116" cy="74" r="24" fill="#FFC9D9"/><rect y="162" width="400" height="34" fill="#A8C98A"/>' + dots([[140, 130], [170, 150], [190, 110], [30, 140]], '#FFB7CC', 3) },
+    { id: 'kosmos', name: 'Księżycowa baza', price: 1000, svg: '<rect width="400" height="196" fill="#0A0A23"/>' + dots(NIGHT_STARS.concat([[110, 120], [290, 50], [380, 20], [20, 70]]), '#FFFFFF', 1.3) +
+      '<circle cx="82" cy="58" r="30" fill="#3B7BEA"/><path d="M62 50q18-12 30 2t-8 22q-24-2-22-24z" fill="#3FA66B"/><circle cx="320" cy="56" r="20" fill="#E8A95C"/><ellipse cx="320" cy="56" rx="36" ry="9" fill="none" stroke="#F5E6C4" stroke-width="3"/><rect y="162" width="400" height="34" fill="#8A8F99"/><ellipse cx="70" cy="178" rx="26" ry="7" fill="#6F747E"/><ellipse cx="280" cy="184" rx="38" ry="8" fill="#6F747E"/>' },
+    { id: 'slodycze', name: 'Kraina słodyczy', price: 1500, svg: '<rect width="400" height="196" fill="#FFD6EC"/><path d="M0 110Q40 70 90 96T200 90T300 96T400 88V196H0Z" fill="#FFB3DA"/>' +
+      '<rect x="56" y="70" width="10" height="94" fill="#FFFFFF"/><circle cx="61" cy="56" r="30" fill="#FF6FAE"/><circle cx="61" cy="56" r="18" fill="#FFD84D"/><circle cx="61" cy="56" r="8" fill="#3CCBDD"/>' +
+      '<rect x="326" y="80" width="10" height="84" fill="#FFFFFF"/><circle cx="331" cy="66" r="26" fill="#3CCBDD"/><circle cx="331" cy="66" r="14" fill="#FFFFFF"/><path d="M180 164L212 92L244 164Z" fill="#F7C948"/><path d="M198 124L226 124L232 138L192 138Z" fill="#FF6FAE"/><rect y="162" width="400" height="34" fill="#C98FE0"/>' + dots([[120, 180], [160, 172], [260, 182], [300, 174], [30, 176], [370, 180]], '#FFFFFF', 3) }
+  ];
+  const bgById = (id) => BGS.find((b) => b.id === id) || BGS[0];
+  const bgSvg = (bg) => '<svg class="bg-svg" viewBox="0 0 400 196" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' + bg.svg + '</svg>';
+
+  // ---------- Wyposażenie: przedmioty stojące w scenie, każdy ma swoje stałe miejsce ----------
+  const itemSvg = (inner) => '<svg viewBox="0 0 100 100" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">' + inner + '</svg>';
+  const ITEMS = [
+    { id: 'kwiat', name: 'Kwiat w doniczce', price: 50, x: 3, svg: '<path d="M50 62V36" stroke-width="5"/><path d="M50 50C38 46 32 52 30 60C40 62 46 58 50 50Z" fill="#2E9E5B"/><circle cx="50" cy="14" r="10" fill="#FF7AA2"/><circle cx="36" cy="26" r="10" fill="#FF7AA2"/><circle cx="64" cy="26" r="10" fill="#FF7AA2"/><circle cx="42" cy="40" r="10" fill="#FF7AA2"/><circle cx="58" cy="40" r="10" fill="#FF7AA2"/><circle cx="50" cy="28" r="8" fill="#FFD84D"/><path d="M28 62H72L66 96H34Z" fill="#C4623A"/>' },
+    { id: 'beczka', name: 'Beczka rumu', price: 80, x: 13, svg: '<path d="M26 22C20 44 20 72 26 94H74C80 72 80 44 74 22Z" fill="#9A6A3C"/><ellipse cx="50" cy="22" rx="24" ry="8" fill="#C49A63"/><path d="M22 42H78M21 74H79" stroke="#3A3F4F" stroke-width="7"/>' },
+    { id: 'latarnia', name: 'Latarnia', price: 100, x: 23, svg: '<path d="M50 40V94M36 94H64" stroke-width="6"/><path d="M34 12H66L60 42H40Z" fill="#FFD84D"/><path d="M30 12H70M42 42H58" stroke-width="6"/><path d="M50 4V12" stroke-width="5"/>' },
+    { id: 'flaga', name: 'Piracka flaga', price: 150, x: 33, svg: '<path d="M26 96V6" stroke-width="6"/><path d="M26 10H88L74 28L88 46H26Z" fill="#15171F"/><circle cx="54" cy="24" r="7" fill="#F7F3E8" stroke-width="2"/><path d="M42 38L66 38" stroke="#F7F3E8" stroke-width="4"/>' },
+    { id: 'kotwica', name: 'Kotwica', price: 200, x: 43, svg: '<circle cx="50" cy="14" r="8" fill="#6F7A8C"/><path d="M50 22V90" stroke="#6F7A8C" stroke-width="10"/><path d="M34 36H66" stroke="#6F7A8C" stroke-width="9"/><path d="M14 62C18 86 38 92 50 92C62 92 82 86 86 62L74 70M14 62L26 70" stroke="#6F7A8C" stroke-width="9"/>' },
+    { id: 'skrzynia', name: 'Skrzynia skarbów', price: 250, x: 53, svg: '<path d="M14 52H86V94H14Z" fill="#8A5A2E"/><path d="M14 52C14 26 86 26 86 52Z" fill="#A9703C"/><path d="M28 34V94M72 34V94" stroke="#E3B341" stroke-width="6"/><rect x="42" y="46" width="16" height="18" fill="#E3B341"/><circle cx="40" cy="28" r="6" fill="#FFD84D"/><circle cx="56" cy="24" r="6" fill="#FFD84D"/>' },
+    { id: 'ognisko', name: 'Ognisko', price: 300, x: 63, svg: '<path d="M18 90L82 78M18 78L82 90" stroke="#6B4A2E" stroke-width="11"/><path d="M50 8C60 28 76 38 72 62C70 78 58 82 50 82C42 82 28 78 28 62C28 46 44 38 50 8Z" fill="#FF7A2E"/><path d="M50 40C56 50 62 56 60 68C58 76 42 76 40 68C38 58 46 52 50 40Z" fill="#FFD84D"/>' },
+    { id: 'globus', name: 'Globus', price: 400, x: 73, svg: '<circle cx="50" cy="40" r="30" fill="#3B7BEA"/><path d="M34 26C44 20 56 26 52 38C48 48 36 46 32 38ZM58 48C68 44 76 50 72 58C66 66 56 62 58 48Z" fill="#2E9E5B" stroke-width="2"/><path d="M50 70V88M32 92H68" stroke-width="7"/>' },
+    { id: 'teleskop', name: 'Luneta', price: 500, x: 83, svg: '<path d="M16 46L80 16L88 34L24 64Z" fill="#E3B341"/><path d="M50 50L30 94M50 50L74 94M50 50V94" stroke="#6B4A2E" stroke-width="6"/><path d="M34 40L44 60" stroke-width="6"/>' },
+    { id: 'tron', name: 'Królewski tron', price: 750, x: 92, svg: '<path d="M26 8L38 18L50 6L62 18L74 8V60H26Z" fill="#7A1F3D"/><path d="M18 60H82V76H18Z" fill="#E3B341"/><path d="M26 76V96M74 76V96" stroke="#E3B341" stroke-width="8"/><circle cx="50" cy="34" r="7" fill="#E5403A"/>' }
+  ];
+  const itemById = (id) => ITEMS.find((i) => i.id === id) || null;
+
+  // Wnętrze sceny: tło i postawione przedmioty
+  function sceneInner(bgId, itemIds) {
+    return bgSvg(bgById(bgId)) + itemIds.map(itemById).filter(Boolean)
+      .map((i) => '<div class="scene-item" style="left:' + i.x + '%">' + itemSvg(i.svg) + '</div>').join('');
+  }
+
+  // Cała postać: nogi, tułów i głowa z kapeluszem to osobne warstwy, żeby mogły się ruszać.
+  // still = bez animacji, np. obrazek na półce w sklepie
+  function avatarSvg(hat, pet, still) {
+    pet = pet || PETS[0];
+    const hatLayer = hat
+      ? '<g class="ava-px" data-depth="40"><g transform="translate(65 -136) scale(2.917) rotate(-6 60 90)" fill="none" stroke-width="4"><g class="ava-hat">' + hat.svg + '</g></g></g>'
+      : '';
+    return '<svg class="' + (still ? 'ava-still' : 'ava') + '" viewBox="-110 -200 680 870" role="img" aria-label="' + pet.name + (hat ? ' w kapeluszu: ' + hat.name : '') + '">' +
+      '<g class="ava-px" data-depth="20"><g class="ava-all" stroke="' + INK + '" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">' +
+      pet.leg('leg-b', 250) + pet.leg('leg-a', 150) +
+      '<g class="ava-dodo">' + pet.body +
+      // Głowa obraca się wokół nasady szyi: ava-droop = smutek, ava-look = patrzenie za palcem
+      '<g transform="translate(228 345)"><g class="ava-droop"><g class="ava-look"><g transform="translate(-228 -345)">' + pet.head + hatLayer + '</g></g></g></g>' +
+      '</g></g></g></svg>';
   }
 
   let tasks = [];
@@ -600,8 +836,19 @@
       // Pierwsze uruchomienie: nic wstecz, pierwszym rozliczanym dniem będzie dzisiaj
       settled: g && g.settled ? String(g.settled) : shiftDay(today(), -1),
       owned: g && Array.isArray(g.owned) ? g.owned.filter(hatById) : [],
-      hat: g && hatById(g.hat) ? g.hat : null
+      hat: g && hatById(g.hat) ? g.hat : null,
+      name: g && typeof g.name === 'string' && g.name.trim() ? g.name.trim().slice(0, 20) : 'Dodo',
+      ownedBg: g && Array.isArray(g.ownedBg) ? g.ownedBg.filter((id) => BGS.some((b) => b.id === id)) : [],
+      bg: 'statek',
+      ownedPets: g && Array.isArray(g.ownedPets) ? g.ownedPets.filter((id) => PETS.some((p) => p.id === id)) : [],
+      pet: 'dodo',
+      ownedItems: g && Array.isArray(g.ownedItems) ? g.ownedItems.filter(itemById) : [],
+      items: []
     };
+    // Używać można tylko tego, co jest kupione
+    if (g && game.ownedBg.includes(g.bg)) game.bg = g.bg;
+    if (g && game.ownedPets.includes(g.pet)) game.pet = g.pet;
+    if (g && Array.isArray(g.items)) game.items = g.items.filter((id) => game.ownedItems.includes(id));
     if (!game.owned.includes(game.hat)) game.hat = null;
     saveGame();
     // Starsze zapisy nie miały kolejności — nadaj ją wg dotychczasowego układu (najnowsze na górze)
@@ -693,7 +940,22 @@
     $('hpBar').classList.toggle('low', game.hp <= MAX_HP * 0.5 && game.hp > MAX_HP * 0.2);
     $('hpBar').classList.toggle('critical', game.hp <= MAX_HP * 0.2);
     $('coins').textContent = game.coins;
-    $('avatar').innerHTML = avatarSvg(hatById(game.hat));
+    $('petName').textContent = game.name;
+    // Rysujemy od nowa tylko po zmianie kapelusza, żeby nie przerywać animacji
+    const sceneNow = game.bg + '|' + game.items.join(',');
+    if (sceneKey !== sceneNow) {
+      sceneKey = sceneNow;
+      $('sceneArt').innerHTML = sceneInner(game.bg, game.items);
+    }
+    const avatarNow = (game.hat || '') + '|' + game.pet;
+    if (avatarKey !== avatarNow) {
+      avatarKey = avatarNow;
+      $('avatar').innerHTML = avatarSvg(hatById(game.hat), petById(game.pet));
+      const ava = $('avatar').querySelector('.ava');
+      ava.classList.toggle('flipped', walker.dir < 0);
+      ava.classList.toggle('walking', walker.walking);
+    }
+    applyMood();
     if (animate) {
       for (const el of [$('coins'), $('hpBar')]) {
         el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
@@ -720,6 +982,7 @@
       item.hpGain = 0;
     }
     addCoins(done ? coins : -coins);
+    if (done) reactAll(true);
   }
   function rewardText(done, coins, hp) {
     const sign = done ? '+' : '−';
@@ -881,73 +1144,125 @@
     return sec;
   }
 
-  // ---------- Sklep ----------
+  // ---------- Sklep: cztery półki ----------
   const ICON_COIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#F5B301" stroke="#9A6A00" stroke-width="1.4"/><circle cx="12" cy="12" r="6.8" fill="#FFD84D" stroke="#C98F00" stroke-width="1.2"/><path d="M10.2 9h2.3a3 3 0 010 6h-2.3z" fill="none" stroke="#9A6A00" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-  let previewHat = null; // kapelusz przymierzany w podglądzie (bez kupowania)
+
+  // kind: pick = zawsze coś wybrane, wear = można zdjąć, place = można mieć wiele naraz
+  const SHELVES = [
+    { id: 'bg', label: 'Tła', items: BGS, ownedKey: 'ownedBg', cur: 'bg', kind: 'pick', free: 'statek', art: (b) => bgSvg(b), flush: true },
+    { id: 'hat', label: 'Ubrania', items: HATS, ownedKey: 'owned', cur: 'hat', kind: 'wear', art: (h) => h.svg_html },
+    { id: 'pet', label: 'Zwierzęta', items: PETS, ownedKey: 'ownedPets', cur: 'pet', kind: 'pick', free: 'dodo', art: (p) => avatarSvg(null, p, true) },
+    { id: 'item', label: 'Wyposażenie', items: ITEMS, ownedKey: 'ownedItems', cur: 'items', kind: 'place', art: (i) => itemSvg(i.svg) }
+  ];
+  let shelfId = 'bg';
+  let preview = null; // przymiarka bez kupowania: id rzeczy z bieżącej półki
+
+  const shelfNow = () => SHELVES.find((s) => s.id === shelfId);
+  const isOwned = (s, id) => id === s.free || game[s.ownedKey].includes(id);
+  const isInUse = (s, id) => (s.kind === 'place' ? game.items.includes(id) : game[s.cur] === id);
 
   function renderShop(lists) {
-    const shown = hatById(previewHat || game.hat);
-    const preview = document.createElement('section');
-    preview.className = 'shop-preview';
-    const note = !shown ? 'Dotknij kapelusza, aby go przymierzyć.'
-      : game.hat === shown.id ? 'Masz go na głowie.'
-      : game.owned.includes(shown.id) ? 'Masz go w szafie.'
-      : 'Przymiarka za darmo · cena: ' + monet(shown.price);
-    preview.innerHTML =
-      '<div class="avatar-wrap"><div class="avatar">' + avatarSvg(shown) + '</div></div>' +
-      '<p class="shop-preview-name">' + (shown ? shown.name : 'Bez kapelusza') + '</p>' +
-      '<p class="shop-preview-note">' + note + '</p>';
-    lists.append(preview);
+    const shelf = shelfNow();
+
+    // Co widać w podglądzie: to, czego używasz, plus ewentualna przymiarka
+    const hat = hatById(shelf.id === 'hat' && preview ? preview : game.hat);
+    const bgId = shelf.id === 'bg' && preview ? preview : game.bg;
+    const pet = petById(shelf.id === 'pet' && preview ? preview : game.pet);
+    const items = shelf.id === 'item' && preview && !game.items.includes(preview) ? game.items.concat(preview) : game.items;
+
+    const shownItem = preview ? shelf.items.find((x) => x.id === preview) : null;
+    const box = document.createElement('section');
+    box.className = 'shop-preview';
+    const stage = document.createElement('div');
+    stage.className = 'shop-scene';
+    stage.innerHTML = sceneInner(bgId, items) + '<div class="shop-pet">' + avatarSvg(hat, pet) + '</div>';
+    box.append(stage);
+    if (shownItem) {
+      const name = document.createElement('p');
+      name.className = 'shop-preview-name';
+      name.textContent = shownItem.name;
+      const note = document.createElement('p');
+      note.className = 'shop-preview-note';
+      note.textContent = isInUse(shelf, shownItem.id) ? 'W użyciu.' : isOwned(shelf, shownItem.id) ? 'Masz to już.' : 'Przymiarka za darmo · cena: ' + monet(shownItem.price);
+      box.append(name, note);
+    }
+    lists.append(box);
+
+    const tabs = document.createElement('div');
+    tabs.className = 'shelves';
+    for (const s of SHELVES) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'shelf-tab';
+      b.dataset.shelf = s.id;
+      b.setAttribute('aria-pressed', String(s.id === shelf.id));
+      b.textContent = s.label;
+      tabs.append(b);
+    }
+    lists.append(tabs);
 
     const grid = document.createElement('div');
     grid.className = 'hat-grid';
-    for (const h of HATS) {
-      const owned = game.owned.includes(h.id);
-      const worn = game.hat === h.id;
+    for (const it of shelf.items) {
+      const owned = isOwned(shelf, it.id);
+      const used = isInUse(shelf, it.id);
       let action;
-      if (worn) action = '<button class="hat-action worn" type="button" data-action="off">Zdejmij</button>';
-      else if (owned) action = '<button class="hat-action owned" type="button" data-action="wear">Załóż</button>';
-      else action = '<button class="hat-action" type="button" data-action="buy"' + (game.coins < h.price ? ' disabled' : '') + ' aria-label="Kup za ' + monet(h.price) + '">' + ICON_COIN + h.price + '</button>';
+      if (used && shelf.kind === 'pick') action = '<button class="hat-action worn" type="button" disabled>Wybrane</button>';
+      else if (used) action = '<button class="hat-action worn" type="button" data-action="off">' + (shelf.kind === 'wear' ? 'Zdejmij' : 'Schowaj') + '</button>';
+      else if (owned) action = '<button class="hat-action owned" type="button" data-action="use">' + ({ pick: 'Wybierz', wear: 'Załóż', place: 'Postaw' })[shelf.kind] + '</button>';
+      else action = '<button class="hat-action" type="button" data-action="buy"' + (game.coins < it.price ? ' disabled' : '') + ' aria-label="Kup za ' + monet(it.price) + '">' + ICON_COIN + it.price + '</button>';
       const card = document.createElement('div');
-      card.className = 'hat-card' + (previewHat === h.id ? ' previewed' : '');
-      card.dataset.hat = h.id;
+      card.className = 'hat-card' + (preview === it.id ? ' previewed' : '');
+      card.dataset.id = it.id;
       card.innerHTML =
-        '<button class="hat-art" type="button" aria-label="Przymierz: ' + h.name + '">' + h.svg_html + '</button>' +
-        '<p class="hat-name">' + h.name + '</p>' + action;
+        '<button class="hat-art' + (shelf.flush ? ' flush' : '') + '" type="button" aria-label="Przymierz: ' + it.name + '">' + shelf.art(it) + '</button>' +
+        '<p class="hat-name">' + it.name + '</p>' + action;
       grid.append(card);
     }
     lists.append(grid);
+    applyMood();
   }
 
-  function buyHat(h) {
-    if (game.owned.includes(h.id) || game.coins < h.price) return;
-    const previous = game.hat;
-    game.coins -= h.price;
-    game.owned.push(h.id);
-    game.hat = h.id;
-    previewHat = null;
+  function useItem(shelf, id) {
+    if (shelf.kind === 'place') { if (!game.items.includes(id)) game.items.push(id); }
+    else game[shelf.cur] = id;
+  }
+
+  function buyItem(shelf, it) {
+    if (isOwned(shelf, it.id) || game.coins < it.price) return;
+    const prevCur = shelf.kind === 'place' ? game.items.slice() : game[shelf.cur];
+    game.coins -= it.price;
+    game[shelf.ownedKey].push(it.id);
+    useItem(shelf, it.id);
+    preview = null;
     saveGame(); renderProfile(true); render();
-    toast('Kupiono: „' + h.name + '” · −' + monet(h.price), () => {
-      game.coins += h.price;
-      game.owned = game.owned.filter((id) => id !== h.id);
-      game.hat = previous;
+    reactAll(true);
+    toast('Kupiono: „' + it.name + '” · −' + monet(it.price), () => {
+      game.coins += it.price;
+      game[shelf.ownedKey] = game[shelf.ownedKey].filter((id) => id !== it.id);
+      if (shelf.kind === 'place') game.items = prevCur; else game[shelf.cur] = prevCur;
       saveGame(); renderProfile(true); render();
     });
   }
 
   function shopClick(e) {
+    const stage = e.target.closest('.shop-scene');
+    if (stage) { react(stage.querySelector('.ava'), false); return; }
+    const tab = e.target.closest('.shelf-tab');
+    if (tab) { shelfId = tab.dataset.shelf; preview = null; render(); return; }
     const card = e.target.closest('.hat-card');
     if (!card) return;
-    const h = hatById(card.dataset.hat);
-    if (e.target.closest('.hat-art')) { previewHat = previewHat === h.id ? null : h.id; render(); return; }
+    const shelf = shelfNow();
+    const it = shelf.items.find((x) => x.id === card.dataset.id);
+    if (e.target.closest('.hat-art')) { preview = preview === it.id ? null : it.id; render(); return; }
     const btn = e.target.closest('.hat-action');
     if (!btn) return;
-    if (btn.dataset.action === 'buy') buyHat(h);
-    else {
-      game.hat = btn.dataset.action === 'wear' ? h.id : null;
-      previewHat = null;
-      saveGame(); renderProfile(false); render();
-    }
+    if (btn.dataset.action === 'buy') { buyItem(shelf, it); return; }
+    if (btn.dataset.action === 'use') useItem(shelf, it.id);
+    else if (shelf.kind === 'place') game.items = game.items.filter((id) => id !== it.id);
+    else game.hat = null;
+    preview = null;
+    saveGame(); renderProfile(false); render();
   }
 
   // Sekcja „Zrobione dziś” w zakładce Codzienne — zwijana jak kategoria, bez + i ⋯
@@ -1014,7 +1329,8 @@
     const dailyDoneCount = dailies.filter(doneToday).length;
 
     $('pageTitle').textContent = { active: 'Do zrobienia', done: 'Zrobione', daily: 'Codzienne', shop: 'Sklep' }[filter];
-    $('heroAvatar').hidden = filter === 'shop'; // w sklepie jest duży podgląd
+    $('scene').hidden = filter === 'shop'; // w sklepie jest duży podgląd
+    centerPet();
     $('addLabel').textContent = filter === 'daily' ? 'Nowe codzienne' : 'Nowe zadanie';
 
     if (filter === 'daily') {
@@ -1035,29 +1351,24 @@
 
     $('actions').hidden = filter === 'shop';
     if (filter === 'shop') {
-      $('count').textContent = 'Kapelusze dla dodo';
+      $('count').textContent = 'Wydaj swoje monety';
       renderShop(lists);
       lists.hidden = false;
-      $('hint').hidden = true;
       $('empty').hidden = true;
       $('clearDone').hidden = true;
       return;
     }
 
-    let shownCount;
     if (filter === 'daily') {
       const all = dailies.slice().sort((a, b) => a.order - b.order);
       const todo = all.filter((d) => !doneToday(d));
       const doneNow = all.filter(doneToday);
-      shownCount = all.length;
       if (all.length) lists.append(buildProgress(dailyDoneCount, all.length));
       if (todo.length) lists.append(buildList(todo, false, '', 'daily'));
       else if (all.length) lists.append(buildList([], false, 'Wszystko na dziś zrobione! Jutro rano zadania wrócą.'));
       if (doneNow.length) lists.append(buildDailyDone(doneNow));
       lists.hidden = !lists.children.length;
 
-      $('hint').hidden = all.length === 0;
-      $('hint').textContent = 'W prawo — zrobione na dziś. W lewo — usuń na stałe. Jutro rano wszystko wróci do zrobienia.';
       $('empty').hidden = all.length > 0;
       $('emptyTitle').textContent = 'Brak codziennych zadań';
       $('emptySub').textContent = 'Dodaj złotym przyciskiem to, co robisz każdego dnia, np. „Umyć zęby rano”. Każdego ranka wróci na listę.';
@@ -1067,22 +1378,14 @@
 
     if (filter === 'done') {
       const done = sorted.filter((t) => t.done);
-      shownCount = done.length;
       if (done.length) lists.append(buildList(done, true));
     } else {
       const active = sorted.filter((t) => !t.done);
-      shownCount = active.length;
       const loose = active.filter((t) => !t.cat);
       if (loose.length) lists.append(buildList(loose, false));
       for (const c of cats) lists.append(buildCategory(c, active.filter((t) => t.cat === c.id)));
     }
     lists.hidden = !lists.children.length;
-
-    $('hint').hidden = shownCount === 0;
-    $('hint').textContent = (filter === 'done'
-      ? 'W prawo — przywróć. W lewo — usuń.'
-      : 'W prawo — zrobione. W lewo — usuń.')
-      + ' Dotknij zadania, aby je zmienić lub przenieść. Przeciągnij za ≡, aby zmienić kolejność.';
 
     // Pusty stan: gdy nie ma czego pokazać (kategorie liczą się jako treść)
     const nothing = filter === 'done' ? doneCount === 0 : activeCount === 0 && cats.length === 0;
@@ -1152,13 +1455,14 @@
 
     $('sheetTitle').textContent = {
       add: 'Nowe zadanie', edit: 'Zadanie', newcat: 'Nowa kategoria', renamecat: 'Zmień nazwę',
-      adddaily: 'Codzienne zadanie', editdaily: 'Codzienne zadanie'
+      adddaily: 'Codzienne zadanie', editdaily: 'Codzienne zadanie', petname: 'Imię dodo'
     }[opts.mode];
     $('sheetOk').textContent = ['add', 'newcat', 'adddaily'].includes(opts.mode) ? 'Dodaj' : 'Zapisz';
-    input.placeholder = isDaily ? 'Co robisz codziennie? np. Umyć zęby rano'
+    const isPet = opts.mode === 'petname';
+    input.placeholder = isPet ? 'np. Kapitan Dziób' : isDaily ? 'Co robisz codziennie? np. Umyć zęby rano'
       : isTask ? 'Co masz do zrobienia?' : 'Nazwa, np. Sport albo Praca';
-    input.maxLength = isTask || isDaily ? 200 : 40;
-    input.value = t ? t.text : c ? c.name : '';
+    input.maxLength = isPet ? 20 : isTask || isDaily ? 200 : 40;
+    input.value = isPet ? game.name : t ? t.text : c ? c.name : '';
     $('sheetOk').disabled = !input.value.trim();
 
     pickedCat = opts.mode === 'edit' && t ? t.cat : (opts.catId && isTask ? opts.catId : null);
@@ -1179,6 +1483,7 @@
 
   $('addBtn').addEventListener('click', () => openSheet({ mode: filter === 'daily' ? 'adddaily' : 'add' }));
   $('newCatBtn').addEventListener('click', () => openSheet({ mode: 'newcat' }));
+  $('petNameBtn').addEventListener('click', () => openSheet({ mode: 'petname' }));
   $('sheetCancel').addEventListener('click', closeSheet);
   $('sheetBackdrop').addEventListener('click', closeSheet);
   input.addEventListener('input', () => { $('sheetOk').disabled = !input.value.trim(); });
@@ -1221,6 +1526,9 @@
     } else if (sheet.mode === 'renamecat') {
       const c = catById(sheet.catId);
       if (c) { c.name = text; saveCats(); render(); }
+    } else if (sheet.mode === 'petname') {
+      game.name = text;
+      saveGame(); renderProfile(false);
     } else if (sheet.mode === 'adddaily') {
       // Nowe codzienne trafia na koniec listy — kolejność dnia ustawiasz przeciąganiem
       const last = dailies.reduce((m, d) => Math.max(m, d.order), 0);
@@ -1270,7 +1578,8 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (!$('summary').hidden) $('summaryOk').click();
+    if (!$('petView').hidden) $('petView').hidden = true;
+    else if (!$('summary').hidden) $('summaryOk').click();
     else if (!$('menu').hidden) closeMenu();
     else if (!$('sheet').hidden) closeSheet();
   });
@@ -1550,10 +1859,196 @@
     const b = e.target.closest('button[data-filter]');
     if (!b) return;
     filter = b.dataset.filter;
-    previewHat = null;
+    preview = null;
     lsSet(LS_FILTER, filter);
     render();
   });
+
+  // ---------- Żywy dodo: mruganie, oko za palcem, reakcje, nastrój ----------
+  let avatarKey = null;      // kapelusz i zwierzę aktualnie narysowane u góry
+  let sceneKey = null;       // tło i przedmioty aktualnie narysowane w scenie
+  const walker = { x: null, dir: 1, walking: false }; // położenie dodo na pokładzie
+
+  function applyMood() {
+    const sad = game.hp <= MAX_HP * 0.2;
+    document.querySelectorAll('.ava').forEach((a) => a.classList.toggle('sad', sad));
+  }
+
+  function react(ava, happy) {
+    ava.classList.remove('hop', 'happy');
+    void ava.getBoundingClientRect(); // restart animacji
+    ava.classList.add('hop');
+    if (happy) ava.classList.add('happy');
+    clearTimeout(ava.reactTimer);
+    ava.reactTimer = setTimeout(() => ava.classList.remove('hop', 'happy'), happy ? 1500 : 620);
+  }
+  function reactAll(happy) { document.querySelectorAll('.ava').forEach((a) => react(a, happy)); }
+
+  // Oko patrzy za palcem, a gdy palca nie ma, rozgląda się samo
+  let lookX = 0, lookY = 0, lookAt = 0, lookFrame = 0;
+  let idle = { x: 12, y: 6 };
+  function aimPupils() {
+    lookFrame = 0;
+    const following = Date.now() - lookAt < 2500;
+    document.querySelectorAll('.ava').forEach((a) => {
+      const eye = a.querySelector('.ava-eye');
+      const r = eye.getBoundingClientRect();
+      if (!r.width) return; // awatar ukryty albo oczy „radosne”
+      let x = idle.x, y = a.classList.contains('sad') ? 10 : idle.y, headTurn = 0;
+      if (following) {
+        const box = a.getBoundingClientRect();
+        // Gdy stoi, obraca się przodem do palca
+        if (!a.classList.contains('walking') && Math.abs(lookX - (box.left + box.width / 2)) > 24) {
+          const left = lookX < box.left + box.width / 2;
+          a.classList.toggle('flipped', left);
+          if (a === heroAva()) walker.dir = left ? -1 : 1;
+        }
+        const dx = lookX - (r.left + r.width / 2), dy = lookY - (r.top + r.height / 2);
+        const d = Math.hypot(dx, dy) || 1, near = Math.min(1, d / 60);
+        // Odbicie lustrzane zamienia lewo z prawem również dla źrenicy
+        x = dx / d * 14 * near * (a.classList.contains('flipped') ? -1 : 1);
+        y = dy / d * 18 * near;
+        headTurn = Math.max(-12, Math.min(12, dy / d * 14));
+      }
+      a.querySelector('.ava-pupil').style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      a.querySelector('.ava-look').style.transform = 'rotate(' + headTurn + 'deg)';
+    });
+  }
+  function onLook(e) {
+    lookX = e.clientX; lookY = e.clientY; lookAt = Date.now();
+    if (!lookFrame) lookFrame = requestAnimationFrame(aimPupils);
+  }
+  window.addEventListener('pointermove', onLook, { passive: true });
+  window.addEventListener('pointerdown', onLook, { passive: true });
+
+  // Chodzenie po pokładzie
+  const pet = $('heroAvatar');
+  const scene = $('scene');
+  const calmMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function heroAva() { return $('avatar').querySelector('.ava'); }
+  function petRange() { return Math.max(16, scene.clientWidth - pet.offsetWidth - 16); }
+  function placePet(x) {
+    walker.x = x;
+    pet.style.transform = 'translateX(' + x + 'px)';
+  }
+  function centerPet() {
+    if (walker.x === null && scene.clientWidth) placePet((16 + petRange()) / 2);
+  }
+  function walkTo(target) {
+    const ava = heroAva();
+    if (calmMotion || walker.walking || walker.x === null || !ava) return;
+    const x = Math.max(16, Math.min(petRange(), target));
+    const dist = Math.abs(x - walker.x);
+    if (dist < 12) return;
+    walker.dir = x < walker.x ? -1 : 1;
+    ava.classList.toggle('flipped', walker.dir < 0);
+    ava.classList.add('walking');
+    walker.walking = true;
+    const seconds = dist / 48;
+    pet.style.transition = 'transform ' + seconds + 's linear';
+    placePet(x);
+    setTimeout(() => {
+      walker.walking = false;
+      pet.style.transition = '';
+      heroAva().classList.remove('walking');
+    }, seconds * 1000);
+  }
+  window.addEventListener('resize', () => {
+    if (walker.x !== null) placePet(Math.max(16, Math.min(petRange(), walker.x)));
+  });
+
+  // Czasem sam się przespaceruje albo rozejrzy
+  (function wander() {
+    setTimeout(() => {
+      if (!document.hidden && $('petView').hidden && !scene.hidden && !gesture && Date.now() - lookAt > 1500) {
+        if (Math.random() < 0.75) walkTo(16 + Math.random() * petRange());
+        else if (!walker.walking) {
+          walker.dir = -walker.dir;
+          heroAva().classList.toggle('flipped', walker.dir < 0);
+        }
+      }
+      wander();
+    }, 3500 + Math.random() * 6000);
+  })();
+
+  // Czasem podchodzi zobaczyć, co robisz
+  window.addEventListener('pointerdown', (e) => {
+    if (scene.hidden || !$('petView').hidden || e.target.closest('.pet') || Math.random() > 0.35) return;
+    walkTo(e.clientX - scene.getBoundingClientRect().left - pet.offsetWidth / 2);
+  }, { passive: true });
+
+  const IDLE_LOOKS = [{ x: 12, y: 6 }, { x: 12, y: 6 }, { x: -9, y: 4 }, { x: 14, y: -8 }, { x: 0, y: 9 }];
+  setInterval(() => {
+    if (document.hidden || Date.now() - lookAt < 2500) return;
+    idle = IDLE_LOOKS[Math.floor(Math.random() * IDLE_LOOKS.length)];
+    aimPupils();
+  }, 2800);
+
+  function blinkOnce() {
+    const eyes = document.querySelectorAll('.ava-eye');
+    eyes.forEach((e) => e.classList.add('blink'));
+    setTimeout(() => eyes.forEach((e) => e.classList.remove('blink')), 130);
+  }
+  (function blinkLoop() {
+    setTimeout(() => {
+      if (!document.hidden) {
+        blinkOnce();
+        if (Math.random() < 0.2) setTimeout(blinkOnce, 260); // czasem mrugnie dwa razy
+      }
+      blinkLoop();
+    }, 1800 + Math.random() * 4200);
+  })();
+
+  // Widok na cały ekran: dotknięcie = podskok, przesunięcie palcem = obrót
+  const stage = $('petStage');
+  let tilt = null;
+
+  function moodText() {
+    if (game.hp <= MAX_HP * 0.2) return 'Mało sił. Zrób codzienne zadania!';
+    if (game.hp <= MAX_HP * 0.5) return 'Lekkie zmęczenie';
+    return 'Świetny humor';
+  }
+  function openPet() {
+    stage.innerHTML = avatarSvg(hatById(game.hat), petById(game.pet));
+    $('petViewName').textContent = game.name;
+    $('petMood').textContent = moodText();
+    $('petView').hidden = false;
+    applyMood();
+    react(stage.querySelector('.ava'), false);
+  }
+  function setTilt(dx) {
+    const amount = Math.max(-1, Math.min(1, dx / 140));
+    stage.style.transform = amount ? 'perspective(700px) rotateY(' + amount * 26 + 'deg)' : '';
+    stage.querySelectorAll('.ava-px').forEach((g) => {
+      g.style.transform = amount ? 'translateX(' + amount * Number(g.dataset.depth) + 'px)' : '';
+    });
+  }
+
+  $('heroAvatar').addEventListener('click', openPet);
+  $('petClose').addEventListener('click', () => { $('petView').hidden = true; });
+
+  stage.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    tilt = { id: e.pointerId, x: e.clientX, moved: false };
+    stage.classList.add('dragging');
+    try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  stage.addEventListener('pointermove', (e) => {
+    if (!tilt || e.pointerId !== tilt.id) return;
+    const dx = e.clientX - tilt.x;
+    if (Math.abs(dx) > 8) tilt.moved = true;
+    if (tilt.moved) setTilt(dx);
+  });
+  function endTilt(e) {
+    if (!tilt || e.pointerId !== tilt.id) return;
+    const tapped = !tilt.moved && e.type === 'pointerup';
+    tilt = null;
+    stage.classList.remove('dragging');
+    setTilt(0); // wraca do środka
+    if (tapped) react(stage.querySelector('.ava'), false);
+  }
+  stage.addEventListener('pointerup', endTilt);
+  stage.addEventListener('pointercancel', endTilt);
 
   // ---------- Start ----------
   const savedFilter = lsGet(LS_FILTER);

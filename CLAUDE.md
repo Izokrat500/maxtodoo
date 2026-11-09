@@ -33,23 +33,29 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
   - zmiana dnia sprawdzana co 30 s oraz przy powrocie do appki (`visibilitychange`, `focus`),
   - w tej zakładce złoty przycisk dodaje codzienne, przycisk „Nowa kategoria” jest ukryty, nad listą jest pasek „X z Y”.
 - Grywalizacja (localStorage `dodo-gra`: `{hp, coins, settled}`):
-  - u góry ekranu: duży okrągły awatar dodo, pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
+  - u góry ekranu: imię dodo, pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
   - nagrody od razu przy odhaczeniu gestem (`applyReward` w `setDone` / `setDailyDone`): codzienne +1 moneta i +1 HP, z „Do zrobienia” +2 monety i +2 HP; przywrócenie / „Cofnij” zabiera je z powrotem (bez nabijania); usunięcie zrobionego zadania ich nie zabiera,
   - HP nie przekracza 50, dlatego zadanie pamięta w `hpGain`, ile serduszek faktycznie dało, i przy cofnięciu odejmowane jest dokładnie tyle,
   - życie: po zakończeniu dnia każde codzienne niezrobione tego dnia (`doneDate !== dzień`) = −1 HP; zadania z „Do zrobienia” nie odbierają życia; HP nie spada poniżej 0,
   - `settleDays()` rozlicza HP za wszystkie dni od `settled` + 1 do wczoraj (także kilka dni przerwy); zadanie liczy się dopiero od swojego `createdDate`,
   - po rozliczeniu okienko „Nowy dzień!” z podsumowaniem i stratą życia; rozliczenie przy starcie appki i przy zmianie dnia (`checkNewDay`).
-- Sklep (czwarta zakładka; `game.owned` = kupione, `game.hat` = noszony, w `dodo-gra`):
-  - 10 kapeluszy w tablicy `HATS` (ceny 100–1000 monet), rysowane w kodzie jako SVG z kształtów `tricorn` / `bicorn` / `cavalier` / `capotain` i ozdób (`plume`, `tallPlume`, `skull`, `bones`, `gem`, `cockade`, `pearls`),
+- Sklep (czwarta zakładka) ma cztery półki (`SHELVES`), po 10 rzeczy na każdej; zakupy i wybór w `dodo-gra`:
+  - Tła (`BGS`, 100–1500 monet, plus darmowy „Nocny statek”; `game.ownedBg`, `game.bg`): rysunki SVG 400×196, ziemia zaczyna się na wysokości 162,
+  - Ubrania (`HATS`; `game.owned`, `game.hat`),
+  - Zwierzęta (`PETS`, 2000–10000 monet, plus darmowy dodo; `game.ownedPets`, `game.pet`): `makePet` to wspólny szablon ciała z własnymi kolorami, uszami, pyskiem i ogonem, wszystkie mają te same animacje i noszą kapelusze,
+  - Wyposażenie (`ITEMS`, 50–750 monet; `game.ownedItems`, `game.items` = postawione): przedmioty w scenie, każdy ma stałe miejsce (`x` w %), można postawić wiele naraz.
+  - Kapelusze: 10 w tablicy `HATS` (ceny 100–1000 monet), rysowane w kodzie jako SVG z kształtów `tricorn` / `bicorn` / `cavalier` / `capotain` i ozdób (`plume`, `tallPlume`, `skull`, `bones`, `gem`, `cockade`, `pearls`),
   - dotknięcie grafiki = darmowa przymiarka w podglądzie, przycisk = Kup / Załóż / Zdejmij; po zakupie „Cofnij” zwraca monety,
-  - awatar to jeden rysunek SVG z `avatarSvg(hat)`: dodo i kapelusz razem, wszystko mieści się w kole (w kapeluszu dodo jest mniejszy i niżej); koło ma 128 px u góry ekranu i 240 px w sklepie.
+  - kapelusz jest częścią postaci z `avatarSvg(hat)` i porusza się razem z głową.
+- Scena u góry ekranu (`.scene`, ukryta w Sklepie): niebo, morze i pokład, po którym chodzi cała postać dodo (`walkTo`, `walker`): sam spaceruje, czasem podchodzi tam, gdzie dotykasz, a stojąc obraca się przodem do palca i kieruje głowę (`ava-look`).
+- Żywy dodo (każda postać to `svg.ava`, rysowana w `avatarSvg`: nogi, tułów, głowa, kapelusz na osobnych warstwach): oddychanie (CSS), losowe mruganie, źrenica patrzy za palcem i sama się rozgląda, podskok po dotknięciu, radość po odhaczeniu zadania i zakupie (`reactAll(true)`), smutek przy HP ≤ 20% (`applyMood`). Dotknięcie awatara u góry otwiera widok na cały ekran (`openPet`): dotknięcie = podskok, przesunięcie palcem = obrót (`setTilt`, warstwy `.ava-px`). Awatar u góry jest rysowany od nowa tylko po zmianie kapelusza, żeby nie przerywać animacji.
 - Gesty (Pointer Events, działają też myszką), próg 35% szerokości wiersza, zawsze z „Cofnij”:
   - w prawo = odhacz (zielone tło); na zrobionym = przywróć (niebieskie tło),
   - w lewo = usuń (czerwone tło),
   - przeciąganie za uchwyt ≡ zmienia kolejność, z auto-przewijaniem przy krawędzi ekranu.
 - Kopia zapasowa (eksport/import) została usunięta na życzenie właściciela — zadania są tylko w pamięci telefonu.
 - Wygląd „Nocny rejs”: granat i złoto, jeden ciemny motyw (bez trybu jasnego), systemowa czcionka, kolory jako zmienne CSS w `:root`.
-- Układ: u góry na środku dodo (ukryty w Sklepie, gdzie jest duży podgląd), tytuł zależny od zakładki, życie i monety; złoty przycisk „Nowe zadanie”; zakładki w dolnym pasku z ikonami (`.seg`); w „Codziennych” pasek postępu dnia; po odhaczeniu monety i serduszka lecą do paska na górze (`flyRewards`).
+- Układ: u góry imię dodo (`game.name`, dotknięcie = zmiana w okienku), życie i monety, pod nimi scena z dodo (ukryta w Sklepie, gdzie jest duży podgląd), tytuł zależny od zakładki, życie i monety; złoty przycisk „Nowe zadanie”; zakładki w dolnym pasku z ikonami (`.seg`); w „Codziennych” pasek postępu dnia; po odhaczeniu monety i serduszka lecą do paska na górze (`flyRewards`).
 - Tekst w polach ma co najmniej 16 px, żeby Safari nie powiększało strony; elementy do dotykania mają co najmniej 44 px.
 
 ## Testowanie lokalnie

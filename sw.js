@@ -1,6 +1,6 @@
 // Service worker: zapamiętuje pliki appki, żeby działała bez internetu.
 // Po każdej zmianie w plikach podnieś VERSION — wtedy telefon pobierze nową wersję.
-const VERSION = 'zadania-v15';
+const VERSION = 'zadania-v19';
 const FILES = [
   './',
   'index.html',
