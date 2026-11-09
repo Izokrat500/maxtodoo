@@ -354,6 +354,8 @@
   const MAX_HP = 50;
   const COINS_DAILY = 1;
   const COINS_TASK = 2;
+  const HP_DAILY = 1;
+  const HP_TASK = 2;
   const HP_PER_MISS = 1;
   let game = { hp: MAX_HP, coins: 0, settled: null }; // settled = ostatni rozliczony dzień
 
@@ -390,7 +392,8 @@
       done: !!(raw && raw.done),
       createdAt: Number(raw && raw.createdAt) || 0,
       order: Number.isFinite(Number(raw && raw.order)) && raw.order !== null && raw.order !== '' ? Number(raw.order) : null,
-      cat: raw && raw.cat ? String(raw.cat) : null
+      cat: raw && raw.cat ? String(raw.cat) : null,
+      hpGain: Number(raw && raw.hpGain) || 0 // ile serduszek faktycznie dało odhaczenie
     };
   }
   function cleanDaily(raw) {
@@ -400,7 +403,8 @@
       order: Number(raw && raw.order) || 0,
       doneDate: raw && raw.doneDate ? String(raw.doneDate) : null,
       // Od tego dnia zadanie liczy się do rozliczenia (starsze zapisy: od dziś)
-      createdDate: raw && raw.createdDate ? String(raw.createdDate) : today()
+      createdDate: raw && raw.createdDate ? String(raw.createdDate) : today(),
+      hpGain: Number(raw && raw.hpGain) || 0
     };
   }
   function cleanCat(raw) {
@@ -555,6 +559,23 @@
     saveGame();
     renderProfile(true);
   }
+  // Nagroda za odhaczenie. Życie ma limit, więc zapamiętujemy, ile faktycznie przybyło,
+  // i przy cofnięciu zabieramy dokładnie tyle.
+  function applyReward(item, done, coins, hp) {
+    if (done) {
+      const before = game.hp;
+      game.hp = Math.min(MAX_HP, game.hp + hp);
+      item.hpGain = game.hp - before;
+    } else {
+      game.hp = Math.max(0, game.hp - item.hpGain);
+      item.hpGain = 0;
+    }
+    addCoins(done ? coins : -coins);
+  }
+  function rewardText(done, coins, hp) {
+    const sign = done ? '+' : '−';
+    return sign + monet(coins) + (hp ? ', ' + sign + hp + (hp === 1 ? ' serduszko' : ' serduszka') : '');
+  }
   function monet(n) {
     n = Math.abs(n);
     const last = n % 10, last2 = n % 100;
@@ -566,7 +587,7 @@
   function setDailyDone(id, done) {
     const d = dailies.find((x) => x.id === id);
     if (!d) return;
-    if (doneToday(d) !== done) addCoins(done ? COINS_DAILY : -COINS_DAILY);
+    if (doneToday(d) !== done) applyReward(d, done, COINS_DAILY, HP_DAILY);
     d.doneDate = done ? today() : null; saveDaily(); render();
   }
   function removeDaily(id) {
@@ -578,7 +599,7 @@
     const t = tasks.find((x) => x.id === id);
     // Zadanie trafia na górę swojej grupy (świeżo zrobione — na górę zrobionych)
     if (!t) return;
-    if (t.done !== done) addCoins(done ? COINS_TASK : -COINS_TASK);
+    if (t.done !== done) applyReward(t, done, COINS_TASK, HP_TASK);
     t.done = done; t.order = topOrder(); save(); render();
   }
   function moveItems(arr, ids, from, to) {
@@ -1126,9 +1147,10 @@
           return;
         }
         const nowDone = !doneToday(t);
+        const hpTaken = t.hpGain;
         setDailyDone(t.id, nowDone);
         toast((nowDone ? 'Zrobione na dziś: „' : 'Przywrócono: „') + shortText(t.text) + '” · '
-          + (nowDone ? '+' : '−') + monet(COINS_DAILY), () => setDailyDone(t.id, !nowDone));
+          + rewardText(nowDone, COINS_DAILY, nowDone ? t.hpGain : hpTaken), () => setDailyDone(t.id, !nowDone));
         return;
       }
       if (!toRight) {
@@ -1138,9 +1160,10 @@
         return;
       }
       const nowDone = !t.done;
+      const hpTaken = t.hpGain;
       setDone(t.id, nowDone);
       toast((nowDone ? 'Zrobione: „' : 'Przywrócono: „') + shortText(t.text) + '” · '
-        + (nowDone ? '+' : '−') + monet(COINS_TASK), () => setDone(t.id, !nowDone));
+        + rewardText(nowDone, COINS_TASK, nowDone ? t.hpGain : hpTaken), () => setDone(t.id, !nowDone));
     }, 700);
   }
 

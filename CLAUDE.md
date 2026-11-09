@@ -34,7 +34,8 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
   - w tej zakładce niebieski + dodaje codzienne, przycisk „Nowa kategoria” jest ukryty, nagłówek pokazuje „Dziś zrobione: X z Y”.
 - Grywalizacja (localStorage `dodo-gra`: `{hp, coins, settled}`):
   - w prawym górnym rogu profil: awatar (ikona dodo), pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
-  - monety od razu przy odhaczeniu gestem (`addCoins` w `setDone` / `setDailyDone`): codzienne +1, z „Do zrobienia” +2; przywrócenie / „Cofnij” zabiera je z powrotem (bez nabijania); usunięcie zrobionego zadania nie zabiera monet,
+  - nagrody od razu przy odhaczeniu gestem (`applyReward` w `setDone` / `setDailyDone`): codzienne +1 moneta i +1 HP, z „Do zrobienia” +2 monety i +2 HP; przywrócenie / „Cofnij” zabiera je z powrotem (bez nabijania); usunięcie zrobionego zadania ich nie zabiera,
+  - HP nie przekracza 50, dlatego zadanie pamięta w `hpGain`, ile serduszek faktycznie dało, i przy cofnięciu odejmowane jest dokładnie tyle,
   - życie: po zakończeniu dnia każde codzienne niezrobione tego dnia (`doneDate !== dzień`) = −1 HP; zadania z „Do zrobienia” nie odbierają życia; HP nie spada poniżej 0,
   - `settleDays()` rozlicza HP za wszystkie dni od `settled` + 1 do wczoraj (także kilka dni przerwy); zadanie liczy się dopiero od swojego `createdDate`,
   - po rozliczeniu okienko „Nowy dzień!” z podsumowaniem i stratą życia; rozliczenie przy starcie appki i przy zmianie dnia (`checkNewDay`).
