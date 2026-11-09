@@ -12,41 +12,32 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Dodo">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#F2F3F7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E0F12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0D1B33">
 
 <style>
-  /* Layout: jedna kolumna jak natywna lista iOS — duży tytuł, przyciski dodawania, przełącznik filtrów, zwijane kategorie na kartach */
+  /* Styl „Nocny rejs”: granat i złoto. Układ: dodo na środku u góry, zadania na kartach, zakładki na dole pod kciukiem. */
   :root {
-    --bg: #F2F3F7;
-    --card: #FFFFFF;
-    --fg: #16181D;
-    --muted: #6B7180;
-    --line: #E3E5EC;
-    --accent: #2B63D9;
-    --accent-fg: #FFFFFF;
-    --danger: #D93A3A;
-    --success: #2E9E5B;
-    --hp: #E5484D;
-    --coin: #B7791F;
-    --done: #9AA0AD;
-    --seg-bg: #E4E6ED;
-    --seg-on: #FFFFFF;
-    --shadow: 0 1px 2px rgba(22, 30, 60, .06);
+    --bg: #0D1B33;
+    --card: #16294A;
+    --fg: #F1F4FA;
+    --title: #F5E6C4;
+    --muted: #8FA3C2;
+    --line: #2B4470;
+    --accent: #E3B341;
+    --accent-fg: #0D1B33;
+    --danger: #F06A6A;
+    --success: #2FA862;
+    --hp: #FF6470;
+    --done: #6F85A8;
+    --seg-bg: #26406E;
+    --seg-on: #3A5A8F;
+    --shadow: none;
+    --tabbar-h: 60px;
     --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color-scheme: light;
+    color-scheme: dark;
     padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0E0F12; --card: #1B1D22; --fg: #F1F2F5; --muted: #9097A3; --line: #2A2D34;
-      --accent: #5B8DF5; --accent-fg: #0E0F12; --danger: #F06A6A; --success: #2FA862; --hp: #E5484D; --coin: #F2C14E; --done: #6A707C;
-      --seg-bg: #23262C; --seg-on: #3A3E47; --shadow: none;
-      color-scheme: dark;
-    }
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -61,41 +52,59 @@
     margin: 0 auto;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
-    padding-block: 20px 120px;
+    padding-block: 12px calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 90px);
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
 
-  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-top: 8px; }
-  .head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-
-  /* Profil gracza: awatar, pasek życia i monety */
-  .profile { flex: none; width: 150px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .avatar-wrap { width: 112px; height: 112px; }
+  /* Góra ekranu: dodo na środku, tytuł zakładki, życie i monety; w tle gwiazdy */
+  .hero {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 12px; text-align: center;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 22%, #F5E6C4, transparent), radial-gradient(1px 1px at 26% 62%, #8FA3C2, transparent),
+      radial-gradient(1.5px 1.5px at 40% 8%, #8FA3C2, transparent), radial-gradient(1px 1px at 68% 14%, #F5E6C4, transparent),
+      radial-gradient(1.5px 1.5px at 82% 46%, #F5E6C4, transparent), radial-gradient(1px 1px at 92% 18%, #8FA3C2, transparent),
+      radial-gradient(1px 1px at 6% 52%, #8FA3C2, transparent), radial-gradient(1.5px 1.5px at 74% 62%, #8FA3C2, transparent);
+  }
+  .avatar-wrap { width: 128px; height: 128px; margin-bottom: 6px; }
   .hat-svg { display: block; width: 100%; height: auto; overflow: visible; }
-  .avatar { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 3px var(--card), 0 2px 8px rgba(22, 30, 60, .18); }
+  .avatar { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 3px var(--accent); }
   .avatar svg { display: block; width: 100%; height: 100%; }
-  .stat { width: 100%; display: flex; align-items: center; gap: 6px; }
-  .stat-icon { flex: none; width: 20px; height: 20px; }
-  .hp-bar { position: relative; flex: 1; height: 12px; border-radius: 8px; background: var(--seg-bg); overflow: hidden; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .12); }
+  .stats { width: 100%; max-width: 340px; display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+  .stat { display: flex; align-items: center; gap: 6px; }
+  .stat-hp { flex: 1; min-width: 0; }
+  .stat-icon { flex: none; width: 22px; height: 22px; }
+  .hp-bar { position: relative; flex: 1; height: 12px; border-radius: 8px; background: var(--seg-bg); overflow: hidden; }
   .hp-fill { position: absolute; inset: 0 auto 0 0; width: 100%; border-radius: 8px; background: linear-gradient(180deg, #FF7A7F, var(--hp)); transition: width .5s ease, background .3s; }
   .hp-fill::after { content: ""; position: absolute; left: 4px; right: 4px; top: 2px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, .35); }
   .hp-bar.low .hp-fill { background: linear-gradient(180deg, #FFB25C, #E8781C); }
   .hp-bar.critical .hp-fill { background: linear-gradient(180deg, #FF5A5F, #B4232A); animation: pulse 1.2s ease-in-out infinite; }
   .hp-text { flex: none; min-width: 34px; text-align: right; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .coins { flex: 1; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .coins { color: var(--title); font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* Monety i serduszka lecące z odhaczonego zadania do paska na górze */
+  .fly { position: fixed; z-index: 40; width: 26px; height: 26px; pointer-events: none; }
+  .fly svg { display: block; width: 100%; height: 100%; }
+
+  /* Postęp dnia w zakładce Codzienne */
+  .progress { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; background: var(--card); border-radius: 14px; }
+  .progress-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .progress-label { font-weight: 600; }
+  .progress-num { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .progress-track { height: 10px; border-radius: 5px; background: var(--seg-bg); overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 5px; background: var(--accent); transition: width .4s ease; }
   .bump { animation: bump .45s ease; }
   @keyframes pulse { 50% { opacity: .65; } }
   @keyframes bump { 40% { transform: scale(1.25); } }
   .date { margin: 0; color: var(--muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-  h1 { margin: 0; font-family: var(--font-display); font-size: 34px; font-weight: 700; letter-spacing: -.02em; text-wrap: balance; }
+  h1 { margin: 0; color: var(--title); font-family: var(--font-display); font-size: 30px; font-weight: 700; letter-spacing: -.02em; text-wrap: balance; }
   .count { margin: 0; color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
 
   .actions { display: flex; flex-direction: column; gap: 8px; }
-  .add-btn { width: 100%; height: 52px; border-radius: 14px; background: var(--accent); color: var(--accent-fg); display: grid; place-items: center; box-shadow: var(--shadow); transition: opacity .15s; }
+  .add-btn { width: 100%; height: 52px; border-radius: 14px; background: var(--accent); color: var(--accent-fg); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 17px; font-weight: 700; transition: opacity .15s; }
   .add-btn:active { opacity: .8; }
-  .add-btn svg { width: 26px; height: 26px; }
+  .add-btn svg { width: 22px; height: 22px; }
   .cat-btn { width: 100%; height: 44px; border-radius: 14px; background: var(--card); color: var(--accent); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 16px; font-weight: 600; box-shadow: var(--shadow); }
   .cat-btn svg { width: 18px; height: 18px; }
   .cat-btn:active { opacity: .7; }
@@ -107,7 +116,7 @@
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
-  .sheet-backdrop { position: absolute; inset: 0; background: rgba(10, 12, 18, .45); animation: fade .15s ease-out; }
+  .sheet-backdrop { position: absolute; inset: 0; background: rgba(4, 9, 20, .65); animation: fade .15s ease-out; }
   .sheet-card { position: relative; width: 100%; max-width: 528px; display: flex; flex-direction: column; gap: 8px; padding: 6px 8px 16px; background: var(--card); border-radius: 16px; box-shadow: 0 20px 50px rgba(0, 0, 0, .25); animation: pop .18s ease-out; }
   .sheet-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
   .sheet-title { margin: 0; font-weight: 600; }
@@ -161,7 +170,7 @@
   .hat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .hat-card { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); }
   .hat-card.previewed { box-shadow: 0 0 0 2px var(--accent); }
-  .hat-art { display: block; width: 100%; padding: 14px 18px 6px; border-radius: 10px; background: var(--seg-bg); }
+  .hat-art { display: block; width: 100%; padding: 14px 18px 6px; border-radius: 10px; background: #B9CBE6; }
   .hat-name { margin: 0; min-height: 40px; font-size: 15px; font-weight: 600; line-height: 1.3; text-align: center; text-wrap: balance; }
   .hat-action { display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border-radius: 10px; background: var(--accent); color: var(--accent-fg); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .hat-action svg { width: 20px; height: 20px; }
@@ -169,9 +178,17 @@
   .hat-action.worn { background: var(--success); color: #FFFFFF; }
   .hat-action:disabled { background: var(--seg-bg); color: var(--muted); cursor: default; }
 
-  .seg { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--seg-bg); border-radius: 10px; padding: 2px; gap: 2px; }
-  .seg button { height: 34px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); transition: background .15s, color .15s; }
-  .seg button[aria-selected="true"] { background: var(--seg-on); color: var(--fg); box-shadow: var(--shadow); }
+  /* Dolny pasek zakładek */
+  .seg {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    padding-inline: max(8px, calc((100% - 560px) / 2));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--card); border-top: 1px solid var(--line);
+  }
+  .seg button { height: var(--tabbar-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted); font-size: 11px; font-weight: 600; transition: color .15s; }
+  .seg button svg { width: 24px; height: 24px; }
+  .seg button[aria-selected="true"] { color: var(--accent); }
 
   /* Listy: zadania bez kategorii na górze, potem zwijane kategorie */
   .lists { display: flex; flex-direction: column; gap: 20px; }
@@ -201,7 +218,7 @@
   /* Tło odsłaniane gestem: w prawo = zrobione (zielone) / przywróć (niebieskie), w lewo = usuń (czerwone) */
   .swipe-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-inline: 20px; background: var(--danger); color: #FFFFFF; font-size: 15px; font-weight: 600; }
   .item.to-right .swipe-bg { background: var(--success); justify-content: flex-start; }
-  .item.done.to-right .swipe-bg { background: var(--accent); }
+  .item.done.to-right .swipe-bg { background: var(--accent); color: var(--accent-fg); }
   .swipe-label { display: flex; align-items: center; gap: 6px; opacity: .6; transform: scale(.92); transition: opacity .12s, transform .12s; }
   /* W lewo widać tylko „Usuń”, w prawo tylko „Zrobione” / „Przywróć” */
   .swipe-label.act-label, .item.to-right .swipe-label.del-label { display: none; }
@@ -238,7 +255,7 @@
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--tabbar-h) + 12px + env(safe-area-inset-bottom, 0px));
     display: flex; justify-content: center; pointer-events: none;
   }
   .toast-inner { pointer-events: auto; display: flex; align-items: center; gap: 12px; max-width: 528px; width: 100%; background: var(--fg); color: var(--bg); border-radius: 14px; padding: 6px 6px 6px 16px; min-height: 52px; box-shadow: 0 6px 24px rgba(0,0,0,.18); animation: rise .2s ease-out; }
@@ -251,17 +268,15 @@
 <body>
 
 <main class="app">
-  <header>
-    <div class="head-text">
-      <p class="date" id="today"></p>
-      <h1>Zadania</h1>
-      <p class="count" id="count">&nbsp;</p>
+  <header class="hero">
+    <div class="avatar-wrap" id="heroAvatar">
+      <div class="avatar" id="avatar"></div>
     </div>
-    <div class="profile" aria-label="Twój profil">
-      <div class="avatar-wrap">
-        <div class="avatar" id="avatar"></div>
-      </div>
-      <div class="stat" title="Życie">
+    <p class="date" id="today"></p>
+    <h1 id="pageTitle">Do zrobienia</h1>
+    <p class="count" id="count">&nbsp;</p>
+    <div class="stats" aria-label="Twój profil">
+      <div class="stat stat-hp" title="Życie">
         <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 21.2 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1C13.1 3.8 14.8 3 16.5 3 19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5L12 21.2z" fill="#E5484D" stroke="#9E1F25" stroke-width="1.4"/>
           <path d="M7.2 6.2c-1.3.3-2.2 1.4-2.3 2.7" fill="none" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="1.6" stroke-linecap="round"/>
@@ -284,8 +299,9 @@
   </header>
 
   <div class="actions" id="actions">
-    <button class="add-btn" id="addBtn" type="button" aria-label="Dodaj zadanie" aria-haspopup="dialog">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    <button class="add-btn" id="addBtn" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span id="addLabel">Nowe zadanie</span>
     </button>
     <button class="cat-btn" id="newCatBtn" type="button" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -293,12 +309,24 @@
     </button>
   </div>
 
-  <div class="seg" role="tablist" aria-label="Pokaż">
-    <button id="f-active" role="tab" data-filter="active" aria-selected="true">Do zrobienia</button>
-    <button id="f-done" role="tab" data-filter="done" aria-selected="false">Zrobione</button>
-    <button id="f-daily" role="tab" data-filter="daily" aria-selected="false">Codzienne</button>
-    <button id="f-shop" role="tab" data-filter="shop" aria-selected="false">Sklep</button>
-  </div>
+  <nav class="seg" role="tablist" aria-label="Zakładki">
+    <button id="f-active" role="tab" data-filter="active" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17M12 6.5h8M12 12.5h8M12 18.5h8"/></svg>
+      Do zrobienia
+    </button>
+    <button id="f-done" role="tab" data-filter="done" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 9.5"/></svg>
+      Zrobione
+    </button>
+    <button id="f-daily" role="tab" data-filter="daily" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 00-14.3-4.5L4 8M4 4v4h4M4 13a8 8 0 0014.3 4.5L20 16M20 20v-4h-4"/></svg>
+      Codzienne
+    </button>
+    <button id="f-shop" role="tab" data-filter="shop" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 15c4-7 6-9 10-9s6 2 10 9c-6 3-14 3-20 0z"/><path d="M8 12c0-3 1-4 4-4s4 1 4 4"/></svg>
+      Sklep
+    </button>
+  </nav>
 
   <div class="lists" id="lists"></div>
   <p class="hint" id="hint" hidden></p>
@@ -463,12 +491,14 @@
     '<circle cx="274" cy="188" r="16" fill="#141826" stroke="none"/><circle cx="280" cy="180" r="5.5" fill="#FFFFFF" stroke="none"/>' +
     '<path d="M222 128Q262 112 300 136" fill="none" stroke-width="13"/>';
 
+  let avatarCount = 0;
   function avatarSvg(hat) {
     // W kapeluszu dodo jest mniejszy i niżej, żeby nad głową było miejsce
     const dodo = hat ? 'translate(67 159) scale(.72)' : 'translate(45 60) scale(.85)';
+    const bgId = 'avatarBg' + (++avatarCount); // każdy awatar ma własne tło, bo ukryty awatar „gasi” wspólne
     return '<svg viewBox="0 0 512 512" role="img" aria-label="Twój dodo' + (hat ? ' w kapeluszu: ' + hat.name : '') + '">' +
-      '<defs><linearGradient id="avatarBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A84F5"/><stop offset="1" stop-color="#1E4FC4"/></linearGradient></defs>' +
-      '<rect width="512" height="512" fill="url(#avatarBg)"/>' +
+      '<defs><linearGradient id="' + bgId + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A84F5"/><stop offset="1" stop-color="#1E4FC4"/></linearGradient></defs>' +
+      '<rect width="512" height="512" fill="url(#' + bgId + ')"/>' +
       '<g transform="' + dodo + '" stroke="' + INK + '" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">' + DODO_AVATAR + '</g>' +
       (hat ? '<g transform="translate(114 61) scale(2.1) rotate(-6 60 90)" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' + hat.svg + '</g>' : '') +
       '</svg>';
@@ -945,14 +975,50 @@
     return sec;
   }
 
+  function buildProgress(done, total) {
+    const box = document.createElement('div');
+    box.className = 'progress';
+    box.innerHTML =
+      '<div class="progress-top"><span class="progress-label">' + (done === total ? 'Komplet na dziś!' : 'Dzisiejszy postęp') + '</span>' +
+      '<span class="progress-num">' + done + ' z ' + total + '</span></div>' +
+      '<div class="progress-track"><div class="progress-fill" style="width:' + Math.round((done / total) * 100) + '%"></div></div>';
+    return box;
+  }
+
+  // Monety i serduszka lecą z odhaczonego zadania do paska na górze
+  function flyRewards(from, coins, hp) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const send = (icon, target, delay) => {
+      const el = document.createElement('div');
+      el.className = 'fly';
+      el.innerHTML = icon;
+      document.body.append(el);
+      const to = target.getBoundingClientRect();
+      const x0 = from.left + from.width / 2 - 13, y0 = from.top + from.height / 2 - 13;
+      const x1 = to.left + to.width / 2 - 13, y1 = Math.max(8, to.top + to.height / 2 - 13); // gdy strona jest przewinięta: do górnej krawędzi
+      const a = el.animate([
+        { transform: `translate(${x0}px, ${y0}px) scale(.6)`, opacity: 0 },
+        { transform: `translate(${x0}px, ${y0 - 26}px) scale(1.25)`, opacity: 1, offset: .25 },
+        { transform: `translate(${x1}px, ${y1}px) scale(.7)`, opacity: .9 }
+      ], { duration: 720, delay: delay, easing: 'ease-in-out', fill: 'both' });
+      a.onfinish = () => el.remove();
+    };
+    let delay = 0;
+    for (let i = 0; i < coins; i++) { send(ICON_COIN, $('coins'), delay); delay += 110; }
+    for (let i = 0; i < hp; i++) { send(ICON_HEART, $('hpBar'), delay); delay += 110; }
+  }
+
   function render() {
     const activeCount = tasks.filter((t) => !t.done).length;
     const doneCount = tasks.length - activeCount;
     const dailyDoneCount = dailies.filter(doneToday).length;
 
+    $('pageTitle').textContent = { active: 'Do zrobienia', done: 'Zrobione', daily: 'Codzienne', shop: 'Sklep' }[filter];
+    $('heroAvatar').hidden = filter === 'shop'; // w sklepie jest duży podgląd
+    $('addLabel').textContent = filter === 'daily' ? 'Nowe codzienne' : 'Nowe zadanie';
+
     if (filter === 'daily') {
-      $('count').textContent = dailies.length === 0 ? 'Brak codziennych zadań'
-        : 'Dziś zrobione: ' + dailyDoneCount + ' z ' + dailies.length;
+      $('count').textContent = 'Wracają każdego ranka';
     } else {
       $('count').textContent = tasks.length === 0 ? 'Brak zadań'
         : 'Do zrobienia: ' + activeCount + (doneCount ? ' · zrobione: ' + doneCount : '');
@@ -984,6 +1050,7 @@
       const todo = all.filter((d) => !doneToday(d));
       const doneNow = all.filter(doneToday);
       shownCount = all.length;
+      if (all.length) lists.append(buildProgress(dailyDoneCount, all.length));
       if (todo.length) lists.append(buildList(todo, false, '', 'daily'));
       else if (all.length) lists.append(buildList([], false, 'Wszystko na dziś zrobione! Jutro rano zadania wrócą.'));
       if (doneNow.length) lists.append(buildDailyDone(doneNow));
@@ -993,7 +1060,7 @@
       $('hint').textContent = 'W prawo — zrobione na dziś. W lewo — usuń na stałe. Jutro rano wszystko wróci do zrobienia.';
       $('empty').hidden = all.length > 0;
       $('emptyTitle').textContent = 'Brak codziennych zadań';
-      $('emptySub').textContent = 'Dodaj niebieskim + to, co robisz każdego dnia, np. „Umyć zęby rano”. Każdego ranka wróci na listę.';
+      $('emptySub').textContent = 'Dodaj złotym przyciskiem to, co robisz każdego dnia, np. „Umyć zęby rano”. Każdego ranka wróci na listę.';
       $('clearDone').hidden = true;
       return;
     }
@@ -1022,7 +1089,7 @@
     $('empty').hidden = !nothing;
     if (tasks.length === 0 && cats.length === 0) {
       $('emptyTitle').textContent = 'Lista jest pusta';
-      $('emptySub').textContent = 'Dotknij niebieskiego przycisku +, aby dodać pierwsze zadanie.';
+      $('emptySub').textContent = 'Dotknij złotego przycisku, aby dodać pierwsze zadanie.';
     } else if (filter === 'active') {
       $('emptyTitle').textContent = 'Wszystko zrobione!';
       $('emptySub').textContent = 'Nic na Ciebie nie czeka.';
@@ -1328,6 +1395,7 @@
     const t = (isDaily ? dailies : tasks).find((x) => x.id === g.li.dataset.id);
     if (!t) { snapBack(g); return; }
     const toRight = g.dx > 0;
+    const fromRect = g.li.getBoundingClientRect();
     animating = true;
     g.row.style.transition = 'transform .2s ease-out';
     g.row.style.transform = toRight ? 'translateX(100%)' : 'translateX(-100%)';
@@ -1349,6 +1417,7 @@
         const nowDone = !doneToday(t);
         const hpTaken = t.hpGain;
         setDailyDone(t.id, nowDone);
+        if (nowDone) flyRewards(fromRect, COINS_DAILY, t.hpGain);
         toast((nowDone ? 'Zrobione na dziś: „' : 'Przywrócono: „') + shortText(t.text) + '” · '
           + rewardText(nowDone, COINS_DAILY, nowDone ? t.hpGain : hpTaken), () => setDailyDone(t.id, !nowDone));
         return;
@@ -1362,6 +1431,7 @@
       const nowDone = !t.done;
       const hpTaken = t.hpGain;
       setDone(t.id, nowDone);
+      if (nowDone) flyRewards(fromRect, COINS_TASK, t.hpGain);
       toast((nowDone ? 'Zrobione: „' : 'Przywrócono: „') + shortText(t.text) + '” · '
         + rewardText(nowDone, COINS_TASK, nowDone ? t.hpGain : hpTaken), () => setDone(t.id, !nowDone));
     }, 700);

@@ -17,7 +17,7 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
 - Każde zadanie ma pole `order` (mniejsza liczba = wyżej). Niezrobione są zawsze nad zrobionymi; zadanie nowe lub właśnie odhaczone trafia na górę swojej grupy.
 - Cztery zakładki: „Do zrobienia” (domyślna), „Zrobione”, „Codzienne” i „Sklep”. Nie ma widoku „Wszystkie” ani przycisku × do usuwania.
 - Przy zadaniach nie ma klikalnego kółka — zadania odhacza się i usuwa wyłącznie gestami. Zrobione (zakładka „Zrobione” i „Zrobione dziś”) wyglądają jak niezrobione (bez przekreślenia), tylko z nieklikalnym zielonym ptaszkiem po lewej.
-- Dodawanie: pod nagłówkiem jest szeroki niebieski przycisk +; po dotknięciu otwiera się okienko „Nowe zadanie” (u góry ekranu, nad klawiaturą) z polem tekstowym, wyborem kategorii (chipy) oraz „Anuluj” / „Dodaj”.
+- Dodawanie: pod nagłówkiem jest szeroki złoty przycisk „Nowe zadanie”; po dotknięciu otwiera się okienko „Nowe zadanie” (u góry ekranu, nad klawiaturą) z polem tekstowym, wyborem kategorii (chipy) oraz „Anuluj” / „Dodaj”.
 - Kategorie (localStorage `dodo-kategorie`: `{id, name, collapsed}`, zadanie ma pole `cat`):
   - przycisk „+ Nowa kategoria” pod niebieskim przyciskiem,
   - w „Do zrobienia”: najpierw zadania bez kategorii, potem zwijane sekcje (▾/▸ zapamiętane) z licznikiem, własnym „+” i menu „⋯” (zmień nazwę / usuń),
@@ -31,9 +31,9 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
   - w prawo = zrobione na dziś (znika do zwijanej sekcji „Zrobione dziś”, stan zwinięcia w `dodo-codzienne-zwiniete`), w lewo = usuń na stałe, dotknięcie = zmiana treści,
   - kolejność stała (nie zmienia się po odhaczeniu), przeciąganie za ≡; nowe na koniec; bez kategorii,
   - zmiana dnia sprawdzana co 30 s oraz przy powrocie do appki (`visibilitychange`, `focus`),
-  - w tej zakładce niebieski + dodaje codzienne, przycisk „Nowa kategoria” jest ukryty, nagłówek pokazuje „Dziś zrobione: X z Y”.
+  - w tej zakładce złoty przycisk dodaje codzienne, przycisk „Nowa kategoria” jest ukryty, nad listą jest pasek „X z Y”.
 - Grywalizacja (localStorage `dodo-gra`: `{hp, coins, settled}`):
-  - w prawym górnym rogu profil: duży okrągły awatar dodo, pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
+  - u góry ekranu: duży okrągły awatar dodo, pasek życia (max 50 HP; pomarańczowy ≤ 50%, czerwony pulsujący ≤ 20%) i monety; ikony serca i monety to własne SVG w kodzie,
   - nagrody od razu przy odhaczeniu gestem (`applyReward` w `setDone` / `setDailyDone`): codzienne +1 moneta i +1 HP, z „Do zrobienia” +2 monety i +2 HP; przywrócenie / „Cofnij” zabiera je z powrotem (bez nabijania); usunięcie zrobionego zadania ich nie zabiera,
   - HP nie przekracza 50, dlatego zadanie pamięta w `hpGain`, ile serduszek faktycznie dało, i przy cofnięciu odejmowane jest dokładnie tyle,
   - życie: po zakończeniu dnia każde codzienne niezrobione tego dnia (`doneDate !== dzień`) = −1 HP; zadania z „Do zrobienia” nie odbierają życia; HP nie spada poniżej 0,
@@ -42,13 +42,14 @@ Osobista aplikacja to-do, używana na iPhonie jako aplikacja na ekranie początk
 - Sklep (czwarta zakładka; `game.owned` = kupione, `game.hat` = noszony, w `dodo-gra`):
   - 10 kapeluszy w tablicy `HATS` (ceny 100–1000 monet), rysowane w kodzie jako SVG z kształtów `tricorn` / `bicorn` / `cavalier` / `capotain` i ozdób (`plume`, `tallPlume`, `skull`, `bones`, `gem`, `cockade`, `pearls`),
   - dotknięcie grafiki = darmowa przymiarka w podglądzie, przycisk = Kup / Załóż / Zdejmij; po zakupie „Cofnij” zwraca monety,
-  - awatar to jeden rysunek SVG z `avatarSvg(hat)`: dodo i kapelusz razem, wszystko mieści się w kole (w kapeluszu dodo jest mniejszy i niżej); koło ma 112 px w profilu i 240 px w sklepie.
+  - awatar to jeden rysunek SVG z `avatarSvg(hat)`: dodo i kapelusz razem, wszystko mieści się w kole (w kapeluszu dodo jest mniejszy i niżej); koło ma 128 px u góry ekranu i 240 px w sklepie.
 - Gesty (Pointer Events, działają też myszką), próg 35% szerokości wiersza, zawsze z „Cofnij”:
   - w prawo = odhacz (zielone tło); na zrobionym = przywróć (niebieskie tło),
   - w lewo = usuń (czerwone tło),
   - przeciąganie za uchwyt ≡ zmienia kolejność, z auto-przewijaniem przy krawędzi ekranu.
 - Kopia zapasowa (eksport/import) została usunięta na życzenie właściciela — zadania są tylko w pamięci telefonu.
-- Wygląd w stylu iOS: systemowa czcionka, kolory jako zmienne CSS w `:root`, automatyczny tryb ciemny.
+- Wygląd „Nocny rejs”: granat i złoto, jeden ciemny motyw (bez trybu jasnego), systemowa czcionka, kolory jako zmienne CSS w `:root`.
+- Układ: u góry na środku dodo (ukryty w Sklepie, gdzie jest duży podgląd), tytuł zależny od zakładki, życie i monety; złoty przycisk „Nowe zadanie”; zakładki w dolnym pasku z ikonami (`.seg`); w „Codziennych” pasek postępu dnia; po odhaczeniu monety i serduszka lecą do paska na górze (`flyRewards`).
 - Tekst w polach ma co najmniej 16 px, żeby Safari nie powiększało strony; elementy do dotykania mają co najmniej 44 px.
 
 ## Testowanie lokalnie
