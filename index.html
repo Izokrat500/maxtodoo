@@ -58,32 +58,30 @@
     gap: 16px;
   }
 
-  /* Góra ekranu: imię, życie i monety, pokład statku z dodo, tytuł zakładki */
-  .hero { display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
-  .top-row { display: flex; align-items: center; gap: 8px; }
-  .title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 6px; }
-  .title-row h1 { flex: none; font-size: 26px; white-space: nowrap; }
-  .title-info { min-width: 0; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
-  .title-info p { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .title-info .date { font-size: 11px; }
-  .title-info .count { font-size: 13px; }
-
-  /* Scena: wybrane tło, postawione przedmioty i chodzące zwierzę */
-  .scene { position: relative; height: 196px; margin-inline: -16px; overflow: hidden; }
+  /* Góra ekranu: awatar w kole, imię, tytuł zakładki, życie i monety; w tle gwiazdy */
+  .hero {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 12px; text-align: center;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 22%, #F5E6C4, transparent), radial-gradient(1px 1px at 26% 62%, #8FA3C2, transparent),
+      radial-gradient(1.5px 1.5px at 40% 8%, #8FA3C2, transparent), radial-gradient(1px 1px at 68% 14%, #F5E6C4, transparent),
+      radial-gradient(1.5px 1.5px at 82% 46%, #F5E6C4, transparent), radial-gradient(1px 1px at 92% 18%, #8FA3C2, transparent),
+      radial-gradient(1px 1px at 6% 52%, #8FA3C2, transparent), radial-gradient(1.5px 1.5px at 74% 62%, #8FA3C2, transparent);
+  }
+  button.avatar-wrap { display: block; width: 128px; height: 128px; margin-bottom: 2px; }
+  .avatar { position: relative; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 3px var(--accent); }
+  .avatar .ava { position: absolute; inset: 0; }
+  .avatar .scene-item { width: 24%; height: 24%; bottom: 5%; }
   .bg-svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
   .scene-item { position: absolute; bottom: 6px; width: 54px; height: 54px; }
   .scene-item svg { display: block; width: 100%; height: 100%; }
-  .pet { position: absolute; left: 0; bottom: 8px; z-index: 1; width: 133px; height: 170px; touch-action: manipulation; }
-  .sprite { width: 100%; height: 100%; }
 
-  .pet-name { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; max-width: 42%; color: var(--accent); font-size: 18px; font-weight: 700; }
+  .pet-name { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; max-width: 100%; padding: 0 10px; color: var(--accent); font-size: 18px; font-weight: 700; }
   .pet-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pet-name svg { flex: none; width: 16px; height: 16px; color: var(--muted); }
   .hat-svg { display: block; width: 100%; height: auto; overflow: visible; }
 
   /* Żywy dodo */
   .ava { display: block; width: 100%; height: 100%; overflow: visible; }
-  .ava.flipped { transform: scaleX(-1); }
   .ava-all, .ava-dodo, .ava-hat, .ava-eye, .ava-brow, .ava-wing { transform-box: fill-box; }
   .ava-all { transform-origin: 50% 100%; }
   .ava-dodo { transform-origin: 50% 100%; }
@@ -92,12 +90,7 @@
   .ava-still .ava-joy { display: none; }
   .ava-hat { transform-origin: 50% 100%; }
   .ava-wing { transform-origin: 30% 20%; }
-  .ava-look { transition: transform .2s ease-out; }
   .ava-droop { transition: transform .5s ease; }
-  .ava.walking .ava-all { animation: walkBob .5s ease-in-out infinite; }
-  .ava.walking .leg-a { animation: stepA .5s ease-in-out infinite; }
-  .ava.walking .leg-b { animation: stepB .5s ease-in-out infinite; }
-  .ava.walking .ava-wing { animation: wingFlap .5s ease-in-out infinite; }
   .ava-eye { transform-origin: 50% 50%; transition: transform .07s; }
   .ava-eye.blink { transform: scaleY(.08); }
   .ava-pupil { transition: transform .14s ease-out; }
@@ -113,10 +106,6 @@
   .ava.hop .ava-hat { animation: hatHop .6s ease-out; }
   @keyframes breathe { 50% { transform: scale(1.012, 1.02); } }
   @keyframes breatheSad { 50% { transform: scale(1.004, 1.01); } }
-  @keyframes walkBob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 25%, 75% { transform: translateY(-10px); } 50% { transform: translateY(0) rotate(1.5deg); } }
-  @keyframes stepA { 0%, 100% { transform: rotate(22deg); } 50% { transform: rotate(-22deg); } }
-  @keyframes stepB { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(22deg); } }
-  @keyframes wingFlap { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(5deg); } }
   @keyframes hop { 12% { transform: scale(1.05, .93); } 40% { transform: translateY(-60px) scale(.98, 1.04); } 70% { transform: none; } 82% { transform: scale(1.04, .96); } }
   @keyframes hatHop { 28% { transform: translateY(-13px) rotate(-8deg); } 58% { transform: rotate(5deg); } 80% { transform: translateY(-2px) rotate(-2deg); } }
 
@@ -124,13 +113,12 @@
   .pet-view { position: fixed; inset: 0; z-index: 24; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px calc(env(safe-area-inset-bottom, 0px) + 16px); background: var(--bg); text-align: center; animation: fade .18s ease-out; }
   .pet-close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 8px); right: max(10px, env(safe-area-inset-right, 0px)); width: 44px; height: 44px; display: grid; place-items: center; color: var(--muted); }
   .pet-close svg { width: 24px; height: 24px; }
-  .pet-stage { height: min(56vh, 460px); aspect-ratio: 640 / 870; max-width: 90vw; touch-action: none; cursor: grab; transition: transform .35s ease-out; }
-  .pet-floor { width: min(90vw, 420px); height: 12px; margin-bottom: 16px; border-radius: 6px; background: repeating-linear-gradient(90deg, #6B4A2E 0 46px, #5A3E27 46px 48px); border-top: 2px solid #8A6238; }
+  .pet-stage { width: min(84vw, 44vh, 400px); height: min(84vw, 44vh, 400px); margin-bottom: 14px; touch-action: none; cursor: grab; transition: transform .35s ease-out; }
   .pet-stage.dragging, .pet-stage.dragging .ava-px { transition: none; }
   .pet-view-name { margin: 0; color: var(--title); font-family: var(--font-display); font-size: 28px; font-weight: 700; overflow-wrap: anywhere; }
   .pet-mood { margin: 0; color: var(--accent); font-size: 16px; font-weight: 600; }
   .pet-help { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
-  .stats { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
+  .stats { width: 100%; max-width: 340px; display: flex; align-items: center; gap: 14px; margin-top: 8px; }
   .stat { display: flex; align-items: center; gap: 6px; }
   .stat-hp { flex: 1; min-width: 0; }
   .stat-icon { flex: none; width: 22px; height: 22px; }
@@ -334,11 +322,16 @@
 
 <main class="app">
   <header class="hero">
-    <div class="top-row">
+    <button class="avatar-wrap" id="heroAvatar" type="button" aria-label="Pokaż zwierzaka na całym ekranie">
+      <div class="avatar" id="avatar"></div>
+    </button>
     <button class="pet-name" id="petNameBtn" type="button" aria-label="Zmień imię dodo" aria-haspopup="dialog">
       <span id="petName">Dodo</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>
     </button>
+    <p class="date" id="today"></p>
+    <h1 id="pageTitle">Do zrobienia</h1>
+    <p class="count" id="count">&nbsp;</p>
     <div class="stats" aria-label="Twój profil">
       <div class="stat stat-hp" title="Życie">
         <svg class="stat-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -358,20 +351,6 @@
           <path d="M6.6 8.4a6.3 6.3 0 012.6-2.4" fill="none" stroke="#FFFFFF" stroke-opacity=".75" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
         <span class="coins" id="coins">0</span>
-      </div>
-    </div>
-    </div>
-    <div class="scene" id="scene">
-      <div id="sceneArt"></div>
-      <button class="pet" id="heroAvatar" type="button" aria-label="Pokaż dodo na całym ekranie">
-        <div class="sprite" id="avatar"></div>
-      </button>
-    </div>
-    <div class="title-row">
-      <h1 id="pageTitle">Do zrobienia</h1>
-      <div class="title-info">
-        <p class="date" id="today"></p>
-        <p class="count" id="count">&nbsp;</p>
       </div>
     </div>
   </header>
@@ -462,8 +441,7 @@
   <button class="pet-close" id="petClose" type="button" aria-label="Zamknij">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
   </button>
-  <div class="pet-stage" id="petStage"></div>
-  <div class="pet-floor"></div>
+  <div class="avatar pet-stage" id="petStage"></div>
   <p class="pet-view-name" id="petViewName"></p>
   <p class="pet-mood" id="petMood"></p>
   <p class="pet-help">Dotknij, żeby podskoczył. Przesuń palcem, żeby go obrócić.</p>
@@ -496,7 +474,7 @@
   const HP_PER_MISS = 1;
   // settled = ostatni rozliczony dzień, owned = kupione kapelusze, hat = noszony, name = imię zwierzaka;
   // ownedBg / ownedPets / ownedItems = pozostałe zakupy, bg = tło, pet = zwierzę, items = postawione przedmioty
-  let game = { hp: MAX_HP, coins: 0, settled: null, owned: [], hat: null, name: 'Dodo', ownedBg: [], bg: 'statek', ownedPets: [], pet: 'dodo', ownedItems: [], items: [] };
+  let game = { hp: MAX_HP, coins: 0, settled: null, owned: [], hat: null, name: 'Dodo', ownedBg: [], bg: 'blekit', ownedPets: [], pet: 'dodo', ownedItems: [], items: [] };
 
   // ---------- Kapelusze do sklepu: składane z prostych kształtów SVG ----------
   const INK = '#141826';
@@ -672,7 +650,8 @@
   const NIGHT_STARS = [[30, 30], [90, 60], [150, 20], [220, 50], [260, 22], [320, 72], [60, 100], [180, 92], [350, 110]];
   const planks = (color) => [48, 96, 144, 192, 240, 288, 336, 384].map((x) => `<rect x="${x}" y="162" width="2" height="34" fill="${color}"/>`).join('');
   const BGS = [
-    { id: 'statek', name: 'Nocny statek', price: 0, svg: '<rect width="400" height="196" fill="#0D1B33"/>' + dots(NIGHT_STARS, '#F5E6C4', 1.2) +
+    { id: 'blekit', name: 'Błękitne tło', price: 0, svg: '<defs><linearGradient id="BGID" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4A84F5"/><stop offset="1" stop-color="#1E4FC4"/></linearGradient></defs><rect width="400" height="196" fill="url(#BGID)"/>' },
+    { id: 'statek', name: 'Nocny statek', price: 50, svg: '<rect width="400" height="196" fill="#0D1B33"/>' + dots(NIGHT_STARS, '#F5E6C4', 1.2) +
       '<circle cx="345" cy="38" r="19" fill="#F5E6C4"/><circle cx="338" cy="35" r="17" fill="#0D1B33" opacity=".14"/><rect y="132" width="400" height="30" fill="#16345F"/><rect y="162" width="400" height="34" fill="#6B4A2E"/><rect y="162" width="400" height="3" fill="#8A6238"/>' + planks('#5A3E27') },
     { id: 'wyspa', name: 'Tropikalna wyspa', price: 100, svg: '<rect width="400" height="196" fill="#7FD4F0"/><circle cx="340" cy="36" r="22" fill="#FFE27A"/><rect y="104" width="400" height="60" fill="#1FA6C9"/><path d="M270 110Q320 76 380 110Z" fill="#3FA66B"/><path d="M0 164Q200 138 400 164V196H0Z" fill="#F2D58C"/><rect y="170" width="400" height="26" fill="#EBC878"/>' +
       '<path d="M50 170C54 130 60 100 74 74L84 78C72 106 68 134 66 170Z" fill="#8A5A2E"/><path d="M78 76C50 56 26 60 12 80C40 70 60 74 78 76ZM78 76C66 46 44 34 22 36C46 48 62 60 78 76ZM78 76C92 48 116 40 134 48C110 54 94 62 78 76ZM78 76C104 66 128 74 138 96C116 82 96 78 78 76Z" fill="#2E9E5B"/>' },
@@ -700,7 +679,8 @@
       '<rect x="326" y="80" width="10" height="84" fill="#FFFFFF"/><circle cx="331" cy="66" r="26" fill="#3CCBDD"/><circle cx="331" cy="66" r="14" fill="#FFFFFF"/><path d="M180 164L212 92L244 164Z" fill="#F7C948"/><path d="M198 124L226 124L232 138L192 138Z" fill="#FF6FAE"/><rect y="162" width="400" height="34" fill="#C98FE0"/>' + dots([[120, 180], [160, 172], [260, 182], [300, 174], [30, 176], [370, 180]], '#FFFFFF', 3) }
   ];
   const bgById = (id) => BGS.find((b) => b.id === id) || BGS[0];
-  const bgSvg = (bg) => '<svg class="bg-svg" viewBox="0 0 400 196" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' + bg.svg + '</svg>';
+  let bgCount = 0; // każde tło z gradientem musi mieć własny identyfikator
+  const bgSvg = (bg) => '<svg class="bg-svg" viewBox="0 0 400 196" preserveAspectRatio="xMidYMax slice" aria-hidden="true">' + bg.svg.replace(/BGID/g, 'bgGrad' + (++bgCount)) + '</svg>';
 
   // ---------- Wyposażenie: przedmioty stojące w scenie, każdy ma swoje stałe miejsce ----------
   const itemSvg = (inner) => '<svg viewBox="0 0 100 100" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">' + inner + '</svg>';
@@ -719,19 +699,21 @@
   const itemById = (id) => ITEMS.find((i) => i.id === id) || null;
 
   // Wnętrze sceny: tło i postawione przedmioty
-  function sceneInner(bgId, itemIds) {
+  function sceneInner(bgId, itemIds, inCircle) {
     return bgSvg(bgById(bgId)) + itemIds.map(itemById).filter(Boolean)
-      .map((i) => '<div class="scene-item" style="left:' + i.x + '%">' + itemSvg(i.svg) + '</div>').join('');
+      .map((i) => '<div class="scene-item" style="left:' + (inCircle ? 8 + i.x * 0.66 : i.x) + '%">' + itemSvg(i.svg) + '</div>').join('');
   }
+  // Awatar w kole: tło, przedmioty i górna część zwierzaka
+  const circleInner = (bgId, itemIds, hat, pet) => sceneInner(bgId, itemIds, true) + avatarSvg(hat, pet, false, true);
 
   // Cała postać: nogi, tułów i głowa z kapeluszem to osobne warstwy, żeby mogły się ruszać.
-  // still = bez animacji, np. obrazek na półce w sklepie
-  function avatarSvg(hat, pet, still) {
+  // still = bez animacji, np. obrazek na półce w sklepie; inCircle = kadr do awatara w kole
+  function avatarSvg(hat, pet, still, inCircle) {
     pet = pet || PETS[0];
     const hatLayer = hat
       ? '<g class="ava-px" data-depth="40"><g transform="translate(65 -136) scale(2.917) rotate(-6 60 90)" fill="none" stroke-width="4"><g class="ava-hat">' + hat.svg + '</g></g></g>'
       : '';
-    return '<svg class="' + (still ? 'ava-still' : 'ava') + '" viewBox="-110 -200 680 870" role="img" aria-label="' + pet.name + (hat ? ' w kapeluszu: ' + hat.name : '') + '">' +
+    return '<svg class="' + (still ? 'ava-still' : 'ava') + '" viewBox="' + (inCircle ? (hat ? '-93 -221 711 711' : '-53 -71 602 602') : '-110 -200 680 870') + '" role="img" aria-label="' + pet.name + (hat ? ' w kapeluszu: ' + hat.name : '') + '">' +
       '<g class="ava-px" data-depth="20"><g class="ava-all" stroke="' + INK + '" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">' +
       pet.leg('leg-b', 250) + pet.leg('leg-a', 150) +
       '<g class="ava-dodo">' + pet.body +
@@ -839,7 +821,7 @@
       hat: g && hatById(g.hat) ? g.hat : null,
       name: g && typeof g.name === 'string' && g.name.trim() ? g.name.trim().slice(0, 20) : 'Dodo',
       ownedBg: g && Array.isArray(g.ownedBg) ? g.ownedBg.filter((id) => BGS.some((b) => b.id === id)) : [],
-      bg: 'statek',
+      bg: 'blekit',
       ownedPets: g && Array.isArray(g.ownedPets) ? g.ownedPets.filter((id) => PETS.some((p) => p.id === id)) : [],
       pet: 'dodo',
       ownedItems: g && Array.isArray(g.ownedItems) ? g.ownedItems.filter(itemById) : [],
@@ -942,18 +924,11 @@
     $('coins').textContent = game.coins;
     $('petName').textContent = game.name;
     // Rysujemy od nowa tylko po zmianie kapelusza, żeby nie przerywać animacji
-    const sceneNow = game.bg + '|' + game.items.join(',');
-    if (sceneKey !== sceneNow) {
-      sceneKey = sceneNow;
-      $('sceneArt').innerHTML = sceneInner(game.bg, game.items);
-    }
-    const avatarNow = (game.hat || '') + '|' + game.pet;
+    // Rysujemy od nowa tylko po zmianie wyglądu, żeby nie przerywać animacji
+    const avatarNow = [game.hat || '', game.pet, game.bg, game.items.join(',')].join('|');
     if (avatarKey !== avatarNow) {
       avatarKey = avatarNow;
-      $('avatar').innerHTML = avatarSvg(hatById(game.hat), petById(game.pet));
-      const ava = $('avatar').querySelector('.ava');
-      ava.classList.toggle('flipped', walker.dir < 0);
-      ava.classList.toggle('walking', walker.walking);
+      $('avatar').innerHTML = circleInner(game.bg, game.items, hatById(game.hat), petById(game.pet));
     }
     applyMood();
     if (animate) {
@@ -1149,7 +1124,7 @@
 
   // kind: pick = zawsze coś wybrane, wear = można zdjąć, place = można mieć wiele naraz
   const SHELVES = [
-    { id: 'bg', label: 'Tła', items: BGS, ownedKey: 'ownedBg', cur: 'bg', kind: 'pick', free: 'statek', art: (b) => bgSvg(b), flush: true },
+    { id: 'bg', label: 'Tła', items: BGS, ownedKey: 'ownedBg', cur: 'bg', kind: 'pick', free: 'blekit', art: (b) => bgSvg(b), flush: true },
     { id: 'hat', label: 'Ubrania', items: HATS, ownedKey: 'owned', cur: 'hat', kind: 'wear', art: (h) => h.svg_html },
     { id: 'pet', label: 'Zwierzęta', items: PETS, ownedKey: 'ownedPets', cur: 'pet', kind: 'pick', free: 'dodo', art: (p) => avatarSvg(null, p, true) },
     { id: 'item', label: 'Wyposażenie', items: ITEMS, ownedKey: 'ownedItems', cur: 'items', kind: 'place', art: (i) => itemSvg(i.svg) }
@@ -1329,8 +1304,8 @@
     const dailyDoneCount = dailies.filter(doneToday).length;
 
     $('pageTitle').textContent = { active: 'Do zrobienia', done: 'Zrobione', daily: 'Codzienne', shop: 'Sklep' }[filter];
-    $('scene').hidden = filter === 'shop'; // w sklepie jest duży podgląd
-    centerPet();
+    $('heroAvatar').hidden = filter === 'shop'; // w sklepie jest duży podgląd
+    $('petNameBtn').hidden = filter === 'shop';
     $('addLabel').textContent = filter === 'daily' ? 'Nowe codzienne' : 'Nowe zadanie';
 
     if (filter === 'daily') {
@@ -1865,9 +1840,7 @@
   });
 
   // ---------- Żywy dodo: mruganie, oko za palcem, reakcje, nastrój ----------
-  let avatarKey = null;      // kapelusz i zwierzę aktualnie narysowane u góry
-  let sceneKey = null;       // tło i przedmioty aktualnie narysowane w scenie
-  const walker = { x: null, dir: 1, walking: false }; // położenie dodo na pokładzie
+  let avatarKey = null;      // wygląd aktualnie narysowany w awatarze u góry
 
   function applyMood() {
     const sad = game.hp <= MAX_HP * 0.2;
@@ -1894,24 +1867,14 @@
       const eye = a.querySelector('.ava-eye');
       const r = eye.getBoundingClientRect();
       if (!r.width) return; // awatar ukryty albo oczy „radosne”
-      let x = idle.x, y = a.classList.contains('sad') ? 10 : idle.y, headTurn = 0;
+      let x = idle.x, y = a.classList.contains('sad') ? 10 : idle.y;
       if (following) {
-        const box = a.getBoundingClientRect();
-        // Gdy stoi, obraca się przodem do palca
-        if (!a.classList.contains('walking') && Math.abs(lookX - (box.left + box.width / 2)) > 24) {
-          const left = lookX < box.left + box.width / 2;
-          a.classList.toggle('flipped', left);
-          if (a === heroAva()) walker.dir = left ? -1 : 1;
-        }
         const dx = lookX - (r.left + r.width / 2), dy = lookY - (r.top + r.height / 2);
         const d = Math.hypot(dx, dy) || 1, near = Math.min(1, d / 60);
-        // Odbicie lustrzane zamienia lewo z prawem również dla źrenicy
-        x = dx / d * 14 * near * (a.classList.contains('flipped') ? -1 : 1);
+        x = dx / d * 14 * near;
         y = dy / d * 18 * near;
-        headTurn = Math.max(-12, Math.min(12, dy / d * 14));
       }
       a.querySelector('.ava-pupil').style.transform = 'translate(' + x + 'px,' + y + 'px)';
-      a.querySelector('.ava-look').style.transform = 'rotate(' + headTurn + 'deg)';
     });
   }
   function onLook(e) {
@@ -1920,62 +1883,6 @@
   }
   window.addEventListener('pointermove', onLook, { passive: true });
   window.addEventListener('pointerdown', onLook, { passive: true });
-
-  // Chodzenie po pokładzie
-  const pet = $('heroAvatar');
-  const scene = $('scene');
-  const calmMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function heroAva() { return $('avatar').querySelector('.ava'); }
-  function petRange() { return Math.max(16, scene.clientWidth - pet.offsetWidth - 16); }
-  function placePet(x) {
-    walker.x = x;
-    pet.style.transform = 'translateX(' + x + 'px)';
-  }
-  function centerPet() {
-    if (walker.x === null && scene.clientWidth) placePet((16 + petRange()) / 2);
-  }
-  function walkTo(target) {
-    const ava = heroAva();
-    if (calmMotion || walker.walking || walker.x === null || !ava) return;
-    const x = Math.max(16, Math.min(petRange(), target));
-    const dist = Math.abs(x - walker.x);
-    if (dist < 12) return;
-    walker.dir = x < walker.x ? -1 : 1;
-    ava.classList.toggle('flipped', walker.dir < 0);
-    ava.classList.add('walking');
-    walker.walking = true;
-    const seconds = dist / 48;
-    pet.style.transition = 'transform ' + seconds + 's linear';
-    placePet(x);
-    setTimeout(() => {
-      walker.walking = false;
-      pet.style.transition = '';
-      heroAva().classList.remove('walking');
-    }, seconds * 1000);
-  }
-  window.addEventListener('resize', () => {
-    if (walker.x !== null) placePet(Math.max(16, Math.min(petRange(), walker.x)));
-  });
-
-  // Czasem sam się przespaceruje albo rozejrzy
-  (function wander() {
-    setTimeout(() => {
-      if (!document.hidden && $('petView').hidden && !scene.hidden && !gesture && Date.now() - lookAt > 1500) {
-        if (Math.random() < 0.75) walkTo(16 + Math.random() * petRange());
-        else if (!walker.walking) {
-          walker.dir = -walker.dir;
-          heroAva().classList.toggle('flipped', walker.dir < 0);
-        }
-      }
-      wander();
-    }, 3500 + Math.random() * 6000);
-  })();
-
-  // Czasem podchodzi zobaczyć, co robisz
-  window.addEventListener('pointerdown', (e) => {
-    if (scene.hidden || !$('petView').hidden || e.target.closest('.pet') || Math.random() > 0.35) return;
-    walkTo(e.clientX - scene.getBoundingClientRect().left - pet.offsetWidth / 2);
-  }, { passive: true });
 
   const IDLE_LOOKS = [{ x: 12, y: 6 }, { x: 12, y: 6 }, { x: -9, y: 4 }, { x: 14, y: -8 }, { x: 0, y: 9 }];
   setInterval(() => {
@@ -2009,7 +1916,7 @@
     return 'Świetny humor';
   }
   function openPet() {
-    stage.innerHTML = avatarSvg(hatById(game.hat), petById(game.pet));
+    stage.innerHTML = circleInner(game.bg, game.items, hatById(game.hat), petById(game.pet));
     $('petViewName').textContent = game.name;
     $('petMood').textContent = moodText();
     $('petView').hidden = false;
